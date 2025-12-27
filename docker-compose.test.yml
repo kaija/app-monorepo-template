@@ -1,0 +1,158 @@
+version: '3.8'
+
+# Docker Compose override for integration testing
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.test.yml up
+
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: line-commerce-postgres-test
+    environment:
+      POSTGRES_DB: ${POSTGRES_TEST_DB:-line_commerce_test}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5433:5432"  # Different port to avoid conflicts
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - line-commerce-test-network
+
+  backend-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: line-commerce-backend-test
+    environment:
+      # Test environment configuration
+      ENVIRONMENT: test
+      
+      # Test database configuration
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres-test:5432/${POSTGRES_TEST_DB:-line_commerce_test}
+      
+      # Authentication & Security (test values)
+      JWT_SECRET_KEY: test-jwt-secret-key-for-testing-only-not-secure
+      JWT_ALGORITHM: HS256
+      JWT_EXPIRE_MINUTES: 30
+      
+      # Application Configuration
+      APP_NAME: "LINE Commerce API (Test)"
+      APP_VERSION: 0.1.0
+      DEBUG: true
+      LOG_LEVEL: debug
+      
+      # CORS Configuration
+      CORS_ORIGINS: http://localhost:3001,http://127.0.0.1:3001
+    ports:
+      - "8001:8000"  # Different port to avoid conflicts
+    volumes:
+      - ./backend:/app
+      - backend_test_cache:/app/.cache
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Waiting for database to be ready...' &&
+        sleep 5 &&
+        echo 'Running database migrations...' &&
+        alembic upgrade head || echo 'Migration failed, creating tables...' &&
+        python -c 'import asyncio; from app.core.database import engine; from app.models import Base; asyncio.run(Base.metadata.create_all(bind=engine.sync_engine))' &&
+        echo 'Starting test server...' &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - line-commerce-test-network
+
+  frontend-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: line-commerce-frontend-test
+    environment:
+      # Test environment configuration
+      NODE_ENV: test
+      
+      # Public API Configuration (test values)
+      NEXT_PUBLIC_API_URL: http://localhost:8001
+      NEXT_PUBLIC_APP_URL: http://localhost:3001
+      NEXT_PUBLIC_APP_NAME: "LINE Commerce (Test)"
+      
+      # Authentication Configuration (test values)
+      NEXTAUTH_URL: http://localhost:3001
+      NEXTAUTH_SECRET: test-nextauth-secret-for-testing-only-not-secure
+      
+      # Feature Flags
+      NEXT_PUBLIC_ENABLE_OAUTH: false  # Disable OAuth for testing
+      NEXT_PUBLIC_ENABLE_REGISTRATION: true
+      
+      # Development Configuration
+      NEXT_TELEMETRY_DISABLED: 1
+    ports:
+      - "3001:3000"  # Different port to avoid conflicts
+    volumes:
+      - ./frontend:/app
+      - frontend_test_node_modules:/app/node_modules
+      - frontend_test_next:/app/.next
+    depends_on:
+      - backend-test
+    command: npm run dev
+    networks:
+      - line-commerce-test-network
+
+  # Test runner service for running automated tests
+  test-runner:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: line-commerce-test-runner
+    environment:
+      ENVIRONMENT: test
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres-test:5432/${POSTGRES_TEST_DB:-line_commerce_test}
+      JWT_SECRET_KEY: test-jwt-secret-key-for-testing-only-not-secure
+    volumes:
+      - ./backend:/app
+      - ./scripts:/scripts
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      backend-test:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Running backend tests...' &&
+        python -m pytest tests/ -v --tb=short &&
+        echo 'Running integration tests...' &&
+        python -m pytest tests/test_api_integration.py -v --tb=short &&
+        echo 'All tests completed!'
+      "
+    networks:
+      - line-commerce-test-network
+
+volumes:
+  postgres_test_data:
+    driver: local
+  backend_test_cache:
+    driver: local
+  frontend_test_node_modules:
+    driver: local
+  frontend_test_next:
+    driver: local
+
+networks:
+  line-commerce-test-network:
+    driver: bridge

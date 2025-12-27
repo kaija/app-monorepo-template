@@ -1,0 +1,108 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ develop ]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: line-commerce-backend
+
+jobs:
+  # Build and deploy to staging environment
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    
+    - name: Build and push backend image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: staging-${{ github.sha }}
+      run: |
+        # Build Docker image
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:staging-latest ./backend
+        
+        # Push images to ECR
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:staging-latest
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ~1.0
+        terraform_wrapper: false
+    
+    - name: Deploy infrastructure
+      env:
+        TF_VAR_backend_image_tag: staging-${{ github.sha }}
+      run: |
+        cd infra
+        terraform init -backend-config=backend-staging.hcl
+        terraform workspace select staging || terraform workspace new staging
+        terraform plan -var-file=environments/staging.tfvars -out=terraform-staging.tfplan
+        terraform apply terraform-staging.tfplan
+    
+    - name: Update ECS service
+      run: |
+        aws ecs update-service \
+          --cluster line-commerce-staging-backend-cluster \
+          --service line-commerce-staging-backend \
+          --force-new-deployment
+        
+        aws ecs wait services-stable \
+          --cluster line-commerce-staging-backend-cluster \
+          --services line-commerce-staging-backend
+    
+    - name: Run database migrations
+      env:
+        DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+        alembic upgrade head
+    
+    - name: Deploy frontend to Vercel (staging)
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        working-directory: ./frontend
+        vercel-args: '--target staging'
+    
+    - name: Run staging smoke tests
+      run: |
+        # Get staging URLs
+        BACKEND_URL=$(cd infra && terraform output -raw backend_api_url)
+        
+        # Wait for services to be ready
+        sleep 30
+        
+        # Test backend health
+        curl -f "$BACKEND_URL/healthz" || exit 1
+        echo "✓ Staging backend health check passed"
+        
+        # Test API documentation
+        curl -f "$BACKEND_URL/docs" || exit 1
+        echo "✓ Staging API documentation accessible"
+        
+        echo "✅ Staging deployment completed successfully"

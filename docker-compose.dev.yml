@@ -1,0 +1,96 @@
+version: '3.8'
+
+# Docker Compose override for enhanced development experience
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  # Add pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: line-commerce-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@linecommerce.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - line-commerce-network
+
+  # Add Redis for caching and session storage (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: line-commerce-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - line-commerce-network
+
+  # Add Mailhog for email testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: line-commerce-mailhog
+    ports:
+      - "1025:1025"  # SMTP server
+      - "8025:8025"  # Web UI
+    networks:
+      - line-commerce-network
+
+  # Enhanced backend with development tools
+  backend:
+    environment:
+      # Add Redis configuration
+      REDIS_URL: redis://redis:6379/0
+      
+      # Add email configuration for development
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      SMTP_USER: ""
+      SMTP_PASSWORD: ""
+      SMTP_TLS: false
+      
+      # Enhanced development settings
+      RELOAD_DIRS: /app
+      RELOAD_INCLUDES: "*.py"
+      RELOAD_EXCLUDES: "__pycache__/*,*.pyc,*.pyo"
+    volumes:
+      # Add additional volume mounts for development
+      - ./backend/tests:/app/tests
+      - ./scripts:/scripts
+    depends_on:
+      - postgres
+      - redis
+      - mailhog
+
+  # Enhanced frontend with development tools
+  frontend:
+    environment:
+      # Add development-specific environment variables
+      NEXT_PUBLIC_REDIS_URL: redis://localhost:6379
+      NEXT_PUBLIC_MAILHOG_URL: http://localhost:8025
+      
+      # Enhanced hot reloading
+      FAST_REFRESH: true
+      NEXT_PRIVATE_STANDALONE: true
+    volumes:
+      # Add test directories
+      - ./frontend/tests:/app/tests
+      - ./frontend/cypress:/app/cypress
+
+volumes:
+  pgadmin_data:
+    driver: local
+  redis_data:
+    driver: local

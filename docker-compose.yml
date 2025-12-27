@@ -1,0 +1,159 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: line-commerce-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-line_commerce}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - line-commerce-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: line-commerce-backend
+    environment:
+      # Environment configuration
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      
+      # Database configuration
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-line_commerce}
+      
+      # Authentication & Security
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-secret-key-change-in-production}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES:-30}
+      
+      # OAuth Configuration
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-}
+      APPLE_CLIENT_SECRET: ${APPLE_CLIENT_SECRET:-}
+      
+      # Application Configuration
+      APP_NAME: ${APP_NAME:-LINE Commerce API}
+      APP_VERSION: ${APP_VERSION:-0.1.0}
+      DEBUG: ${DEBUG:-true}
+      
+      # CORS Configuration
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+      
+      # Development optimizations
+      PYTHONPATH: /app
+      WATCHFILES_FORCE_POLLING: true
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - backend_cache:/app/.cache
+      - /app/__pycache__  # Exclude pycache from volume mount
+      - /app/.pytest_cache  # Exclude pytest cache from volume mount
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Starting backend development server...' &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app --log-level debug
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - line-commerce-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: line-commerce-frontend
+    environment:
+      # Environment configuration
+      NODE_ENV: ${NODE_ENV:-development}
+      
+      # Public API Configuration
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-LINE Commerce}
+      
+      # Authentication Configuration
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-your-nextauth-secret-change-in-production}
+      
+      # OAuth Configuration
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-}
+      APPLE_CLIENT_SECRET: ${APPLE_CLIENT_SECRET:-}
+      
+      # Feature Flags
+      NEXT_PUBLIC_ENABLE_OAUTH: ${NEXT_PUBLIC_ENABLE_OAUTH:-true}
+      NEXT_PUBLIC_ENABLE_REGISTRATION: ${NEXT_PUBLIC_ENABLE_REGISTRATION:-true}
+      
+      # Analytics
+      NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID:-}
+      
+      # Development Configuration
+      NEXT_TELEMETRY_DISABLED: 1
+      WATCHPACK_POLLING: true
+      CHOKIDAR_USEPOLLING: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+      - frontend_next:/app/.next
+      - /app/.next/cache  # Exclude Next.js cache from volume mount
+    depends_on:
+      - backend
+    command: >
+      sh -c "
+        echo 'Installing dependencies...' &&
+        npm ci &&
+        echo 'Starting frontend development server...' &&
+        npm run dev
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - line-commerce-network
+
+volumes:
+  postgres_data:
+    driver: local
+  backend_cache:
+    driver: local
+  frontend_node_modules:
+    driver: local
+  frontend_next:
+    driver: local
+
+networks:
+  line-commerce-network:
+    driver: bridge
