@@ -138,15 +138,39 @@ jobs:
       run: npm ci
 
     - name: Run linting
+      env:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+        NEXT_PUBLIC_APP_URL: http://localhost:3000
+        NEXT_PUBLIC_APP_NAME: "LINE Commerce"
+        NEXTAUTH_URL: http://localhost:3000
+        NEXTAUTH_SECRET: test-nextauth-secret-for-ci-testing-only-not-for-production-use-32chars
       run: npm run lint
 
     - name: Run type checking
+      env:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+        NEXT_PUBLIC_APP_URL: http://localhost:3000
+        NEXT_PUBLIC_APP_NAME: "LINE Commerce"
+        NEXTAUTH_URL: http://localhost:3000
+        NEXTAUTH_SECRET: test-nextauth-secret-for-ci-testing-only-not-for-production-use-32chars
       run: npm run type-check
 
     - name: Run tests
+      env:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+        NEXT_PUBLIC_APP_URL: http://localhost:3000
+        NEXT_PUBLIC_APP_NAME: "LINE Commerce"
+        NEXTAUTH_URL: http://localhost:3000
+        NEXTAUTH_SECRET: test-nextauth-secret-for-ci-testing-only-not-for-production-use-32chars
       run: npm run test
 
     - name: Build application
+      env:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+        NEXT_PUBLIC_APP_URL: http://localhost:3000
+        NEXT_PUBLIC_APP_NAME: "LINE Commerce"
+        NEXTAUTH_URL: http://localhost:3000
+        NEXTAUTH_SECRET: test-nextauth-secret-for-ci-testing-only-not-for-production-use-32chars
       run: npm run build
 
   integration-tests:

@@ -17,7 +17,7 @@ The development environment uses Docker Compose to orchestrate multiple services
 # Clone and setup
 git clone <your-repo-url>
 cd line-commerce-monorepo
-./scripts/setup.sh
+make start
 ```
 
 ### 2. Start Development Environment

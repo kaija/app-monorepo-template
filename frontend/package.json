@@ -43,8 +43,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "start": "next start",
     "test": "jest",
     "test:coverage": "jest --coverage",

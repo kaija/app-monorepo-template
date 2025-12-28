@@ -169,7 +169,7 @@ lint: ## Run linting for backend and frontend
 	@echo "Backend linting:"
 	@./scripts/lint-backend.sh
 	@echo "Frontend linting:"
-	@docker compose -f $(COMPOSE_FILE) exec frontend npm run lint
+	@docker compose -f $(COMPOSE_FILE) exec -e NEXT_PUBLIC_API_URL=http://localhost:8000 -e NEXT_PUBLIC_APP_URL=http://localhost:3000 -e NEXT_PUBLIC_APP_NAME="LINE Commerce" frontend npm run lint
 
 format: ## Format code for backend and frontend
 	@echo "$(BLUE)✨ Formatting code...$(NC)"
