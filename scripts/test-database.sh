@@ -16,6 +16,12 @@ if [ -z "$DATABASE_URL" ]; then
     export DATABASE_URL="postgresql://testuser:testpassword@localhost:5432/testdb"
 fi
 
+# Check if we have JWT_SECRET_KEY
+if [ -z "$JWT_SECRET_KEY" ]; then
+    echo "⚠️  JWT_SECRET_KEY not set. Using test key."
+    export JWT_SECRET_KEY="test-jwt-secret-key-for-local-testing-only-not-for-production-use"
+fi
+
 echo "📊 Database URL: $DATABASE_URL"
 
 # Install dependencies if needed

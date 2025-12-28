@@ -79,6 +79,7 @@ jobs:
     - name: Test fresh database migration
       env:
         DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+        JWT_SECRET_KEY: test-jwt-secret-key-for-ci-testing-only-not-for-production-use
       run: |
         # Test migrating from scratch
         alembic upgrade head
@@ -87,6 +88,7 @@ jobs:
     - name: Test migration rollback
       env:
         DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+        JWT_SECRET_KEY: test-jwt-secret-key-for-ci-testing-only-not-for-production-use
       run: |
         # Test rolling back one migration
         alembic downgrade -1
@@ -99,6 +101,7 @@ jobs:
     - name: Validate database schema
       env:
         DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+        JWT_SECRET_KEY: test-jwt-secret-key-for-ci-testing-only-not-for-production-use
       run: |
         # Run schema validation script
         python -c "
@@ -179,6 +182,7 @@ jobs:
     - name: Create test data and measure migration performance
       env:
         DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+        JWT_SECRET_KEY: test-jwt-secret-key-for-ci-testing-only-not-for-production-use
       run: |
         # Run migrations and measure time
         start_time=$(date +%s)
@@ -199,6 +203,7 @@ jobs:
     - name: Test concurrent migration safety
       env:
         DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+        JWT_SECRET_KEY: test-jwt-secret-key-for-ci-testing-only-not-for-production-use
       run: |
         # Test that running migrations concurrently doesn't cause issues
         python -c "
@@ -273,6 +278,7 @@ jobs:
     - name: Test database backup and restore
       env:
         DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+        JWT_SECRET_KEY: test-jwt-secret-key-for-ci-testing-only-not-for-production-use
       run: |
         # Run migrations
         alembic upgrade head

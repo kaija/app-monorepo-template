@@ -37,7 +37,6 @@ def validate_model_file(file_path: Path, expected_table_name: str) -> bool:
                         and isinstance(item.targets[0], ast.Name)
                         and item.targets[0].id == "__tablename__"
                     ):
-
                         if (
                             isinstance(item.value, ast.Constant)
                             and item.value.value == expected_table_name

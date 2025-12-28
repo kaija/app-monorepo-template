@@ -34,15 +34,15 @@ start: ## Start the development environment
 
 stop: ## Stop all services
 	@echo "$(BLUE)🛑 Stopping services...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) down
+	@docker compose -f $(COMPOSE_FILE) down
 
 restart: ## Restart all services
 	@echo "$(BLUE)🔄 Restarting services...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) restart
+	@docker compose -f $(COMPOSE_FILE) restart
 
 status: ## Show service status and URLs
 	@echo "$(BLUE)📊 Service Status:$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) ps
+	@docker compose -f $(COMPOSE_FILE) ps
 	@echo ""
 	@echo "$(BLUE)🌐 Service URLs:$(NC)"
 	@echo "  Frontend:  http://localhost:3000"
@@ -53,19 +53,19 @@ status: ## Show service status and URLs
 logs: ## Show logs for all services or specific service (usage: make logs service=backend)
 	@if [ -n "$(service)" ]; then \
 		echo "$(BLUE)📋 Showing logs for $(service)...$(NC)"; \
-		docker-compose -f $(COMPOSE_FILE) logs -f $(service); \
+		docker compose -f $(COMPOSE_FILE) logs -f $(service); \
 	else \
 		echo "$(BLUE)📋 Showing logs for all services...$(NC)"; \
-		docker-compose -f $(COMPOSE_FILE) logs -f; \
+		docker compose -f $(COMPOSE_FILE) logs -f; \
 	fi
 
 build: ## Build all Docker images
 	@echo "$(BLUE)🏗️  Building Docker images...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) build --no-cache
+	@docker compose -f $(COMPOSE_FILE) build --no-cache
 
 dev-tools: ## Start development environment with additional tools (pgAdmin, Redis, Mailhog)
 	@echo "$(BLUE)🛠️  Starting development environment with additional tools...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) -f $(COMPOSE_DEV_FILE) up -d --build
+	@docker compose -f $(COMPOSE_FILE) -f $(COMPOSE_DEV_FILE) up -d --build
 	@echo ""
 	@echo "$(GREEN)✅ Development tools started!$(NC)"
 	@echo ""
@@ -84,39 +84,39 @@ test-clean: ## Clean up test environment
 
 seed: ## Seed database with sample data
 	@echo "$(BLUE)🌱 Seeding database...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec backend python /scripts/seed-db.py
+	@docker compose -f $(COMPOSE_FILE) exec backend python /scripts/seed-db.py
 
 reset: ## Reset database (removes all data)
 	@echo "$(YELLOW)⚠️  This will reset the database and remove all data!$(NC)"
 	@read -p "Are you sure? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
 	@echo "$(BLUE)🔄 Resetting database...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec backend python /scripts/reset-db.py
+	@docker compose -f $(COMPOSE_FILE) exec backend python /scripts/reset-db.py
 	@$(MAKE) seed
 
 clean: ## Stop services and clean up Docker resources
 	@echo "$(YELLOW)⚠️  This will stop all services and remove Docker resources!$(NC)"
 	@read -p "Are you sure? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
 	@echo "$(BLUE)🧹 Cleaning up Docker resources...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) -f $(COMPOSE_DEV_FILE) -f $(COMPOSE_TEST_FILE) down -v --remove-orphans
+	@docker compose -f $(COMPOSE_FILE) -f $(COMPOSE_DEV_FILE) -f $(COMPOSE_TEST_FILE) down -v --remove-orphans
 	@docker system prune -f
 	@docker volume prune -f
 	@echo "$(GREEN)✅ Cleanup completed!$(NC)"
 
 shell-backend: ## Open shell in backend container
 	@echo "$(BLUE)🐚 Opening shell in backend container...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec backend bash
+	@docker compose -f $(COMPOSE_FILE) exec backend bash
 
 shell-frontend: ## Open shell in frontend container
 	@echo "$(BLUE)🐚 Opening shell in frontend container...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec frontend sh
+	@docker compose -f $(COMPOSE_FILE) exec frontend sh
 
 shell-db: ## Open PostgreSQL shell
 	@echo "$(BLUE)🐚 Opening PostgreSQL shell...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec postgres psql -U postgres -d line_commerce
+	@docker compose -f $(COMPOSE_FILE) exec postgres psql -U postgres -d line_commerce
 
 migrate: ## Run database migrations
 	@echo "$(BLUE)🔄 Running database migrations...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec backend alembic upgrade head
+	@docker compose -f $(COMPOSE_FILE) exec backend alembic upgrade head
 
 migrate-create: ## Create new migration (usage: make migrate-create message="description")
 	@if [ -z "$(message)" ]; then \
@@ -124,7 +124,7 @@ migrate-create: ## Create new migration (usage: make migrate-create message="des
 		exit 1; \
 	fi
 	@echo "$(BLUE)📝 Creating new migration: $(message)$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec backend alembic revision --autogenerate -m "$(message)"
+	@docker compose -f $(COMPOSE_FILE) exec backend alembic revision --autogenerate -m "$(message)"
 
 validate-migrations: ## Validate Alembic migration files
 	@echo "$(BLUE)🔍 Validating migration files...$(NC)"
@@ -138,24 +138,32 @@ security-scan: ## Run local security scans
 	@echo "$(BLUE)🔒 Running security scans...$(NC)"
 	@./scripts/security-scan.sh
 
+test-all: ## Run comprehensive test suite
+	@echo "$(BLUE)🧪 Running comprehensive test suite...$(NC)"
+	@./scripts/test-all.sh
+
+check-docker: ## Check Docker and Docker Compose installation
+	@echo "$(BLUE)🐳 Checking Docker environment...$(NC)"
+	@./scripts/check-docker.sh
+
 install: ## Install/update dependencies
 	@echo "$(BLUE)📦 Installing dependencies...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec backend pip install -r requirements.txt
-	@docker-compose -f $(COMPOSE_FILE) exec frontend npm install
+	@docker compose -f $(COMPOSE_FILE) exec backend pip install -r requirements.txt
+	@docker compose -f $(COMPOSE_FILE) exec frontend npm install
 
 lint: ## Run linting for backend and frontend
 	@echo "$(BLUE)🔍 Running linting...$(NC)"
 	@echo "Backend linting:"
 	@./scripts/lint-backend.sh
 	@echo "Frontend linting:"
-	@docker-compose -f $(COMPOSE_FILE) exec frontend npm run lint
+	@docker compose -f $(COMPOSE_FILE) exec frontend npm run lint
 
 format: ## Format code for backend and frontend
 	@echo "$(BLUE)✨ Formatting code...$(NC)"
 	@echo "Backend formatting:"
 	@./scripts/format-backend.sh
 	@echo "Frontend formatting:"
-	@docker-compose -f $(COMPOSE_FILE) exec frontend npm run format
+	@docker compose -f $(COMPOSE_FILE) exec frontend npm run format
 
 lint-backend: ## Run backend linting only
 	@echo "$(BLUE)🔍 Running backend linting...$(NC)"
@@ -165,14 +173,22 @@ format-backend: ## Format backend code only
 	@echo "$(BLUE)✨ Formatting backend code...$(NC)"
 	@./scripts/format-backend.sh
 
+fix-linting: ## Fix common linting issues automatically
+	@echo "$(BLUE)🔧 Fixing linting issues...$(NC)"
+	@./scripts/fix-linting.sh
+
 setup-dev: ## Setup development environment with pre-commit hooks
 	@echo "$(BLUE)🛠️  Setting up development environment...$(NC)"
 	@cd backend && ./setup-dev.sh
 
+setup-test-env: ## Setup test environment variables
+	@echo "$(BLUE)🔧 Setting up test environment...$(NC)"
+	@./scripts/setup-test-env.sh
+
 backup-db: ## Backup database to file
 	@echo "$(BLUE)💾 Creating database backup...$(NC)"
 	@mkdir -p backups
-	@docker-compose -f $(COMPOSE_FILE) exec postgres pg_dump -U postgres line_commerce > backups/backup_$(shell date +%Y%m%d_%H%M%S).sql
+	@docker compose -f $(COMPOSE_FILE) exec postgres pg_dump -U postgres line_commerce > backups/backup_$(shell date +%Y%m%d_%H%M%S).sql
 	@echo "$(GREEN)✅ Database backup created in backups/ directory$(NC)"
 
 restore-db: ## Restore database from backup file (usage: make restore-db file=backup.sql)
@@ -185,5 +201,5 @@ restore-db: ## Restore database from backup file (usage: make restore-db file=ba
 		exit 1; \
 	fi
 	@echo "$(BLUE)🔄 Restoring database from $(file)...$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec -T postgres psql -U postgres -d line_commerce < $(file)
+	@docker compose -f $(COMPOSE_FILE) exec -T postgres psql -U postgres -d line_commerce < $(file)
 	@echo "$(GREEN)✅ Database restored successfully$(NC)"

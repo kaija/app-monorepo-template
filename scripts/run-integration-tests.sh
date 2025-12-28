@@ -31,7 +31,7 @@ print_error() {
 # Function to cleanup test environment
 cleanup_test_env() {
     print_status "Cleaning up test environment..."
-    docker-compose -f docker-compose.yml -f docker-compose.test.yml down -v --remove-orphans
+    docker compose -f docker-compose.yml -f docker-compose.test.yml down -v --remove-orphans
     docker volume prune -f
 }
 
@@ -44,7 +44,7 @@ wait_for_service_health() {
     print_status "Waiting for $service_name to be healthy..."
     
     while [ $attempt -le $max_attempts ]; do
-        if docker-compose -f docker-compose.yml -f docker-compose.test.yml ps | grep -q "$service_name.*healthy"; then
+        if docker compose -f docker-compose.yml -f docker-compose.test.yml ps | grep -q "$service_name.*healthy"; then
             print_success "$service_name is healthy!"
             return 0
         fi
@@ -63,7 +63,7 @@ wait_for_service_health() {
     
     # Show logs for debugging
     print_status "Showing logs for $service_name:"
-    docker-compose -f docker-compose.yml -f docker-compose.test.yml logs "$service_name"
+    docker compose -f docker-compose.yml -f docker-compose.test.yml logs "$service_name"
     
     return 1
 }
@@ -94,7 +94,7 @@ test_database_connectivity() {
     print_status "Testing database connectivity..."
     
     # Test database connection from backend
-    if docker-compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend-test python -c "
+    if docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend-test python -c "
 import asyncio
 from app.core.database import engine
 from sqlalchemy import text
@@ -120,7 +120,7 @@ test_authentication_flow() {
     print_status "Testing authentication flow..."
     
     # Test user registration and login
-    if docker-compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend-test python -c "
+    if docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend-test python -c "
 import asyncio
 import httpx
 from app.core.config import get_settings
@@ -182,7 +182,7 @@ exit(0 if result else 1)
 test_crud_operations() {
     print_status "Testing CRUD operations..."
     
-    if docker-compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend-test python -c "
+    if docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend-test python -c "
 import asyncio
 import httpx
 
@@ -255,7 +255,7 @@ run_all_tests() {
     
     # Start test environment
     print_status "Starting test environment..."
-    docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d --build
+    docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --build
     
     # Wait for services to be healthy
     wait_for_service_health "line-commerce-postgres-test" || return 1
@@ -272,7 +272,7 @@ run_all_tests() {
     
     # Run pytest test suite
     print_status "Running pytest test suite..."
-    if docker-compose -f docker-compose.yml -f docker-compose.test.yml run --rm test-runner; then
+    if docker compose -f docker-compose.yml -f docker-compose.test.yml run --rm test-runner; then
         print_success "Pytest test suite passed"
     else
         print_error "Pytest test suite failed"

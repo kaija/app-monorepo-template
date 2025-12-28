@@ -38,7 +38,7 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # Check if Docker Compose is installed
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     print_error "Docker Compose is not installed. Please install Docker Compose first."
     echo "Visit: https://docs.docker.com/compose/install/"
     exit 1
@@ -102,7 +102,7 @@ print_status "   make dev-tools          # Start with additional tools (pgAdmin,
 print_status "   make help               # See all available commands"
 print_status ""
 print_status "📋 Option 2 - Using Docker Compose directly:"
-print_status "   docker-compose up -d    # Start basic environment"
+print_status "   docker compose up -d    # Start basic environment"
 print_status "   ./scripts/dev-setup.sh  # Start with full setup script"
 print_status ""
 print_status "📋 Option 3 - Using development scripts:"

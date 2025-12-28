@@ -43,7 +43,7 @@ wait_for_service() {
     print_status "Waiting for $service_name to be healthy..."
     
     while [ $attempt -le $max_attempts ]; do
-        if docker-compose ps | grep -q "$service_name.*healthy"; then
+        if docker compose ps | grep -q "$service_name.*healthy"; then
             print_success "$service_name is healthy!"
             return 0
         fi
@@ -67,7 +67,7 @@ check_prerequisites() {
         exit 1
     fi
     
-    if ! command_exists docker-compose; then
+    if ! command_exists docker compose; then
         print_error "Docker Compose is not installed. Please install Docker Compose first."
         echo "Visit: https://docs.docker.com/compose/install/"
         exit 1
@@ -120,11 +120,11 @@ start_services() {
     
     # Build images
     print_status "Building Docker images..."
-    docker-compose build --no-cache
+    docker compose build --no-cache
     
     # Start services
     print_status "Starting services..."
-    docker-compose up -d
+    docker compose up -d
     
     # Wait for PostgreSQL to be healthy
     wait_for_service "line-commerce-postgres"
@@ -140,14 +140,14 @@ run_migrations() {
     print_status "Running database migrations..."
     
     # Run Alembic migrations in the backend container
-    if docker-compose exec -T backend alembic upgrade head; then
+    if docker compose exec -T backend alembic upgrade head; then
         print_success "Database migrations completed!"
     else
         print_warning "Migration failed or Alembic not configured yet"
         print_status "Creating tables from models instead..."
         
         # Fallback: create tables directly from models
-        docker-compose exec -T backend python -c "
+        docker compose exec -T backend python -c "
 import asyncio
 from app.core.database import engine
 from app.models import Base
@@ -168,18 +168,18 @@ print('Tables created successfully!')
 seed_database() {
     print_status "Seeding database with sample data..."
     
-    if docker-compose exec -T backend python /app/../scripts/seed-db.py; then
+    if docker compose exec -T backend python /app/../scripts/seed-db.py; then
         print_success "Database seeded successfully!"
     else
         print_warning "Database seeding failed. You can run it manually later with:"
-        print_warning "docker-compose exec backend python /app/../scripts/seed-db.py"
+        print_warning "docker compose exec backend python /app/../scripts/seed-db.py"
     fi
 }
 
 # Function to show service status
 show_status() {
     print_status "Service Status:"
-    docker-compose ps
+    docker compose ps
     
     echo ""
     print_status "Service URLs:"
@@ -190,9 +190,9 @@ show_status() {
     
     echo ""
     print_status "Useful Commands:"
-    echo "  📋 View logs:           docker-compose logs -f [service]"
-    echo "  🔄 Restart service:     docker-compose restart [service]"
-    echo "  🛑 Stop all services:   docker-compose down"
+    echo "  📋 View logs:           docker compose logs -f [service]"
+    echo "  🔄 Restart service:     docker compose restart [service]"
+    echo "  🛑 Stop all services:   docker compose down"
     echo "  🗑️  Reset database:      python scripts/reset-db.py"
     echo "  🌱 Seed database:       python scripts/seed-db.py"
 }
@@ -202,19 +202,19 @@ run_tests() {
     print_status "Running integration tests..."
     
     # Ensure services are running
-    if ! docker-compose ps | grep -q "line-commerce-backend.*Up"; then
+    if ! docker compose ps | grep -q "line-commerce-backend.*Up"; then
         print_error "Backend service is not running. Please start services first."
         exit 1
     fi
     
     # Run backend tests
     print_status "Running backend tests..."
-    docker-compose exec -T backend python -m pytest tests/ -v
+    docker compose exec -T backend python -m pytest tests/ -v
     
     # Run frontend tests (if they exist)
     if [ -d "frontend/tests" ] || [ -f "frontend/package.json" ]; then
         print_status "Running frontend tests..."
-        docker-compose exec -T frontend npm test -- --watchAll=false
+        docker compose exec -T frontend npm test -- --watchAll=false
     fi
     
     print_success "All tests completed!"
@@ -225,7 +225,7 @@ cleanup() {
     print_status "Cleaning up Docker resources..."
     
     # Stop and remove containers
-    docker-compose down -v
+    docker compose down -v
     
     # Remove unused images
     docker image prune -f
@@ -249,12 +249,12 @@ case "${1:-start}" in
         ;;
     "stop")
         print_status "Stopping services..."
-        docker-compose down
+        docker compose down
         print_success "Services stopped!"
         ;;
     "restart")
         print_status "Restarting services..."
-        docker-compose restart
+        docker compose restart
         show_status
         ;;
     "status")
@@ -263,9 +263,9 @@ case "${1:-start}" in
     "logs")
         service=${2:-}
         if [ -n "$service" ]; then
-            docker-compose logs -f "$service"
+            docker compose logs -f "$service"
         else
-            docker-compose logs -f
+            docker compose logs -f
         fi
         ;;
     "test")
@@ -276,7 +276,7 @@ case "${1:-start}" in
         read -p "Are you sure? (y/N): " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
-            docker-compose exec -T backend python /app/../scripts/reset-db.py
+            docker compose exec -T backend python /app/../scripts/reset-db.py
             seed_database
         else
             print_status "Reset cancelled."
