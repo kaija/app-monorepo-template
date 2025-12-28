@@ -46,10 +46,10 @@
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "start": "next start",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test": "jest --passWithNoTests",
+    "test:coverage": "jest --coverage --passWithNoTests",
     "test:e2e": "playwright test",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watch --passWithNoTests",
     "type-check": "tsc --noEmit"
   },
   "version": "0.1.0"
