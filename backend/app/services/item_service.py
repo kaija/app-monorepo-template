@@ -25,10 +25,7 @@ class ItemService:
         return await self.repository.get_item_by_id(item_id)
 
     async def get_user_items(
-        self, 
-        user_id: UUID, 
-        page: int = 1, 
-        per_page: int = 20
+        self, user_id: UUID, page: int = 1, per_page: int = 20
     ) -> Tuple[list[Item], int]:
         """Get items for a specific user with pagination."""
         if page < 1:
@@ -39,9 +36,7 @@ class ItemService:
         return await self.repository.get_items_by_user(user_id, page, per_page)
 
     async def get_all_items(
-        self, 
-        page: int = 1, 
-        per_page: int = 20
+        self, page: int = 1, per_page: int = 20
     ) -> Tuple[list[Item], int]:
         """Get all items with pagination."""
         if page < 1:
@@ -52,10 +47,7 @@ class ItemService:
         return await self.repository.get_all_items(page, per_page)
 
     async def update_item(
-        self, 
-        item_id: UUID, 
-        item_data: ItemUpdate, 
-        user_id: UUID
+        self, item_id: UUID, item_data: ItemUpdate, user_id: UUID
     ) -> Optional[Item]:
         """Update an item (only by owner)."""
         return await self.repository.update_item(item_id, item_data, user_id)

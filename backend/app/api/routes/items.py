@@ -27,12 +27,12 @@ async def create_item(
 ) -> ItemResponse:
     """
     Create a new item.
-    
+
     Args:
         item_data: Item creation data
         current_user: Current authenticated user
         item_service: Item service dependency
-        
+
     Returns:
         ItemResponse: Created item data
     """
@@ -40,10 +40,7 @@ async def create_item(
         item = await item_service.create_item(item_data, current_user.id)
         return ItemResponse.model_validate(item)
     except Exception as e:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Failed to create item: {str(e)}"
-        )
+        raise HTTPException(status_code=400, detail=f"Failed to create item: {str(e)}")
 
 
 @router.get("/items", response_model=ItemListResponse)
@@ -55,13 +52,13 @@ async def get_items(
 ) -> ItemListResponse:
     """
     Get items with pagination.
-    
+
     Args:
         page: Page number (1-based)
         per_page: Number of items per page (1-100)
         user_id: Optional user ID filter
         item_service: Item service dependency
-        
+
     Returns:
         ItemListResponse: Paginated list of items
     """
@@ -86,8 +83,7 @@ async def get_items(
         )
     except Exception as e:
         raise HTTPException(
-            status_code=400,
-            detail=f"Failed to retrieve items: {str(e)}"
+            status_code=400, detail=f"Failed to retrieve items: {str(e)}"
         )
 
 
@@ -98,24 +94,21 @@ async def get_item(
 ) -> ItemResponse:
     """
     Get a specific item by ID.
-    
+
     Args:
         item_id: Item UUID
         item_service: Item service dependency
-        
+
     Returns:
         ItemResponse: Item data
-        
+
     Raises:
         HTTPException: If item not found
     """
     item = await item_service.get_item(item_id)
     if not item:
-        raise HTTPException(
-            status_code=404,
-            detail="Item not found"
-        )
-    
+        raise HTTPException(status_code=404, detail="Item not found")
+
     return ItemResponse.model_validate(item)
 
 
@@ -128,16 +121,16 @@ async def update_item(
 ) -> ItemResponse:
     """
     Update an item.
-    
+
     Args:
         item_id: Item UUID
         item_data: Item update data
         current_user: Current authenticated user
         item_service: Item service dependency
-        
+
     Returns:
         ItemResponse: Updated item data
-        
+
     Raises:
         HTTPException: If item not found or user not authorized
     """
@@ -145,9 +138,9 @@ async def update_item(
     if not item:
         raise HTTPException(
             status_code=404,
-            detail="Item not found or you don't have permission to update it"
+            detail="Item not found or you don't have permission to update it",
         )
-    
+
     return ItemResponse.model_validate(item)
 
 
@@ -159,12 +152,12 @@ async def delete_item(
 ) -> None:
     """
     Delete an item.
-    
+
     Args:
         item_id: Item UUID
         current_user: Current authenticated user
         item_service: Item service dependency
-        
+
     Raises:
         HTTPException: If item not found or user not authorized
     """
@@ -172,5 +165,5 @@ async def delete_item(
     if not success:
         raise HTTPException(
             status_code=404,
-            detail="Item not found or you don't have permission to delete it"
+            detail="Item not found or you don't have permission to delete it",
         )

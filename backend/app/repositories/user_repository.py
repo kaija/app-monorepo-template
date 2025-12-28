@@ -42,7 +42,7 @@ class UserRepository:
             select(User).where(
                 User.oauth_provider == provider,
                 User.oauth_id == oauth_id,
-                User.is_active == True
+                User.is_active == True,
             )
         )
         return result.scalar_one_or_none()

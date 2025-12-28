@@ -1,7 +1,8 @@
 """Tests for authentication system functionality."""
 
-import pytest
 from uuid import uuid4
+
+import pytest
 
 from app.core.security import (
     create_access_token,
@@ -22,17 +23,14 @@ class TestSecurityFunctions:
         """Test JWT token creation and verification."""
         user_id = str(uuid4())
         email = "test@example.com"
-        
+
         # Create token
-        token = create_access_token({
-            "sub": user_id,
-            "email": email
-        })
-        
+        token = create_access_token({"sub": user_id, "email": email})
+
         # Token should be a string
         assert isinstance(token, str)
         assert len(token) > 0
-        
+
         # Verify token
         token_data = verify_token(token)
         assert token_data is not None
@@ -43,6 +41,6 @@ class TestSecurityFunctions:
         """Test verification of invalid tokens."""
         # Invalid token should return None
         assert verify_token("invalid_token") is None
-        
+
         # Empty token should return None
         assert verify_token("") is None

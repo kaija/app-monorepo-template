@@ -134,19 +134,28 @@ install: ## Install/update dependencies
 lint: ## Run linting for backend and frontend
 	@echo "$(BLUE)🔍 Running linting...$(NC)"
 	@echo "Backend linting:"
-	@docker-compose -f $(COMPOSE_FILE) exec backend black --check app/
-	@docker-compose -f $(COMPOSE_FILE) exec backend isort --check-only app/
-	@docker-compose -f $(COMPOSE_FILE) exec backend flake8 app/
+	@./scripts/lint-backend.sh
 	@echo "Frontend linting:"
 	@docker-compose -f $(COMPOSE_FILE) exec frontend npm run lint
 
 format: ## Format code for backend and frontend
 	@echo "$(BLUE)✨ Formatting code...$(NC)"
 	@echo "Backend formatting:"
-	@docker-compose -f $(COMPOSE_FILE) exec backend black app/
-	@docker-compose -f $(COMPOSE_FILE) exec backend isort app/
+	@./scripts/format-backend.sh
 	@echo "Frontend formatting:"
 	@docker-compose -f $(COMPOSE_FILE) exec frontend npm run format
+
+lint-backend: ## Run backend linting only
+	@echo "$(BLUE)🔍 Running backend linting...$(NC)"
+	@./scripts/lint-backend.sh
+
+format-backend: ## Format backend code only
+	@echo "$(BLUE)✨ Formatting backend code...$(NC)"
+	@./scripts/format-backend.sh
+
+setup-dev: ## Setup development environment with pre-commit hooks
+	@echo "$(BLUE)🛠️  Setting up development environment...$(NC)"
+	@cd backend && ./setup-dev.sh
 
 backup-db: ## Backup database to file
 	@echo "$(BLUE)💾 Creating database backup...$(NC)"

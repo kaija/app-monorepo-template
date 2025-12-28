@@ -9,8 +9,8 @@ from sqlalchemy.pool import NullPool
 
 # Database URL from environment variable
 DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "postgresql+asyncpg://postgres:postgres@localhost:5432/line_commerce"
+    "DATABASE_URL",
+    "postgresql+asyncpg://postgres:postgres@localhost:5432/line_commerce",
 )
 
 # Convert sync postgres URL to async if needed
@@ -51,9 +51,9 @@ async def init_db() -> None:
     """Initialize database tables."""
     async with engine.begin() as conn:
         # Import all models to ensure they are registered with Base
-        from app.models.user import User  # noqa: F401
         from app.models.item import Item  # noqa: F401
-        
+        from app.models.user import User  # noqa: F401
+
         await conn.run_sync(Base.metadata.create_all)
 
 

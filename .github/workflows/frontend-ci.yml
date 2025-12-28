@@ -11,6 +11,7 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
+  workflow_call:
 
 jobs:
   lint-and-build:
@@ -58,7 +59,7 @@ jobs:
       run: npm run build
     
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: frontend-build-${{ matrix.node-version }}
         path: frontend/.next/
@@ -99,7 +100,7 @@ jobs:
       run: npm run test:e2e
     
     - name: Upload Playwright report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report

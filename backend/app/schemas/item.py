@@ -5,11 +5,12 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ItemBase(BaseModel):
     """Base item schema."""
+
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = None
     price: Optional[Decimal] = Field(None, ge=0)
@@ -17,11 +18,13 @@ class ItemBase(BaseModel):
 
 class ItemCreate(ItemBase):
     """Schema for creating a new item."""
+
     pass
 
 
 class ItemUpdate(BaseModel):
     """Schema for updating an item."""
+
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = None
     price: Optional[Decimal] = Field(None, ge=0)
@@ -29,8 +32,9 @@ class ItemUpdate(BaseModel):
 
 class ItemResponse(ItemBase):
     """Schema for item response."""
+
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: UUID
     user_id: UUID
     created_at: datetime
@@ -39,6 +43,7 @@ class ItemResponse(ItemBase):
 
 class ItemListResponse(BaseModel):
     """Schema for paginated item list response."""
+
     items: list[ItemResponse]
     total: int
     page: int

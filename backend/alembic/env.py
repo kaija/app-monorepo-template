@@ -1,6 +1,7 @@
 import asyncio
 import os
 from logging.config import fileConfig
+
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
@@ -19,8 +20,8 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 from app.core.database import Base
-from app.models.user import User
 from app.models.item import Item
+from app.models.user import User
 
 target_metadata = Base.metadata
 

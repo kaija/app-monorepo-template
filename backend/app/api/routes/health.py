@@ -15,10 +15,10 @@ settings = get_settings()
 async def health_check(db: AsyncSession = Depends(DatabaseSession)) -> dict[str, str]:
     """
     Health check endpoint.
-    
+
     Returns:
         dict: Health status including database connectivity
-        
+
     Raises:
         HTTPException: If health check fails
     """
@@ -26,12 +26,12 @@ async def health_check(db: AsyncSession = Depends(DatabaseSession)) -> dict[str,
         # Test database connectivity
         result = await db.execute(text("SELECT 1"))
         result.fetchone()
-        
+
         return {
             "status": "healthy",
             "service": settings.app_name,
             "version": settings.app_version,
-            "database": "connected"
+            "database": "connected",
         }
     except Exception as e:
         raise HTTPException(
@@ -41,6 +41,6 @@ async def health_check(db: AsyncSession = Depends(DatabaseSession)) -> dict[str,
                 "service": settings.app_name,
                 "version": settings.app_version,
                 "database": "disconnected",
-                "error": str(e)
-            }
+                "error": str(e),
+            },
         )

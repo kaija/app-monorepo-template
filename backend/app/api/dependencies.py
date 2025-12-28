@@ -4,7 +4,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import Cookie, Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -22,19 +22,19 @@ bearer_scheme = HTTPBearer(auto_error=False)
 async def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
     access_token: Optional[str] = Cookie(None),
-    db: AsyncSession = Depends(DatabaseSession)
+    db: AsyncSession = Depends(DatabaseSession),
 ) -> User:
     """
     Get current authenticated user from JWT token in Authorization header or cookie.
-    
+
     Args:
         credentials: Bearer token from Authorization header
         access_token: JWT token from HTTP-only cookie
         db: Database session
-        
+
     Returns:
         User: Current authenticated user
-        
+
     Raises:
         HTTPException: If authentication fails
     """
@@ -65,7 +65,7 @@ async def get_current_user(
 
     user_repo = UserRepository(db)
     user = await user_repo.get_by_id(user_id)
-    
+
     if not user:
         raise credentials_exception
 
@@ -73,23 +73,22 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ) -> User:
     """
     Get current active user.
-    
+
     Args:
         current_user: Current user from get_current_user dependency
-        
+
     Returns:
         User: Current active user
-        
+
     Raises:
         HTTPException: If user is inactive
     """
     if not current_user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
         )
     return current_user

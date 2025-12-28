@@ -31,16 +31,11 @@ class ItemRepository:
 
     async def get_item_by_id(self, item_id: UUID) -> Optional[Item]:
         """Get item by ID."""
-        result = await self.db.execute(
-            select(Item).where(Item.id == item_id)
-        )
+        result = await self.db.execute(select(Item).where(Item.id == item_id))
         return result.scalar_one_or_none()
 
     async def get_items_by_user(
-        self, 
-        user_id: UUID, 
-        page: int = 1, 
-        per_page: int = 20
+        self, user_id: UUID, page: int = 1, per_page: int = 20
     ) -> Tuple[list[Item], int]:
         """Get items by user with pagination."""
         # Get total count
@@ -63,34 +58,24 @@ class ItemRepository:
         return list(items), total
 
     async def get_all_items(
-        self, 
-        page: int = 1, 
-        per_page: int = 20
+        self, page: int = 1, per_page: int = 20
     ) -> Tuple[list[Item], int]:
         """Get all items with pagination."""
         # Get total count
-        count_result = await self.db.execute(
-            select(func.count(Item.id))
-        )
+        count_result = await self.db.execute(select(func.count(Item.id)))
         total = count_result.scalar() or 0
 
         # Get items with pagination
         offset = (page - 1) * per_page
         result = await self.db.execute(
-            select(Item)
-            .order_by(Item.created_at.desc())
-            .offset(offset)
-            .limit(per_page)
+            select(Item).order_by(Item.created_at.desc()).offset(offset).limit(per_page)
         )
         items = result.scalars().all()
 
         return list(items), total
 
     async def update_item(
-        self, 
-        item_id: UUID, 
-        item_data: ItemUpdate, 
-        user_id: UUID
+        self, item_id: UUID, item_data: ItemUpdate, user_id: UUID
     ) -> Optional[Item]:
         """Update an item (only by owner)."""
         item = await self.get_item_by_id(item_id)

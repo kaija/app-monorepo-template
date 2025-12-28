@@ -22,12 +22,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print(f"   Environment: {settings.environment}")
     print(f"   Debug mode: {settings.debug}")
     print(f"   OAuth enabled: {settings.oauth_enabled()}")
-    
+
     await init_db()
     print("✅ Database initialized successfully")
-    
+
     yield
-    
+
     # Shutdown
     print("🛑 Shutting down application...")
     await close_db()
@@ -67,7 +67,7 @@ app = create_app()
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",

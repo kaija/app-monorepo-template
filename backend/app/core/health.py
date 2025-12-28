@@ -14,37 +14,35 @@ async def check_database_health() -> dict[str, str]:
             # Execute a simple query to test connectivity
             result = await db.execute(text("SELECT 1 as health_check"))
             row = result.fetchone()
-            
+
             if row and row[0] == 1:
                 return {
                     "status": "healthy",
                     "database": "connected",
-                    "message": "Database connection successful"
+                    "message": "Database connection successful",
                 }
             else:
                 return {
                     "status": "unhealthy",
                     "database": "error",
-                    "message": "Database query returned unexpected result"
+                    "message": "Database query returned unexpected result",
                 }
-                
+
     except Exception as e:
         return {
             "status": "unhealthy",
             "database": "disconnected",
-            "message": f"Database connection failed: {str(e)}"
+            "message": f"Database connection failed: {str(e)}",
         }
 
 
 async def get_health_status() -> dict[str, any]:
     """Get comprehensive health status of the application."""
     db_health = await check_database_health()
-    
+
     return {
         "app": "LINE Commerce API",
         "version": "0.1.0",
         "status": db_health["status"],
-        "checks": {
-            "database": db_health
-        }
+        "checks": {"database": db_health},
     }
