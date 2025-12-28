@@ -1,5 +1,3 @@
-version: '3.8'
-
 # Docker Compose override for integration testing
 # Usage: docker compose -f docker-compose.yml -f docker-compose.test.yml up
 
@@ -38,7 +36,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres-test:5432/${POSTGRES_TEST_DB:-line_commerce_test}
 
       # Authentication & Security (test values)
-      JWT_SECRET_KEY: test-jwt-secret-key-for-testing-only-not-secure
+      JWT_SECRET_KEY: test-jwt-secret-key-for-testing-only-not-secure-min-32-chars
       JWT_ALGORITHM: HS256
       JWT_EXPIRE_MINUTES: 30
 
@@ -64,7 +62,7 @@ services:
         sleep 5 &&
         echo 'Running database migrations...' &&
         alembic upgrade head || echo 'Migration failed, creating tables...' &&
-        python -c 'import asyncio; from app.core.database import engine; from app.models import Base; asyncio.run(Base.metadata.create_all(bind=engine.sync_engine))' &&
+        python -c 'from app.core.database import create_tables; create_tables()' &&
         echo 'Starting test server...' &&
         uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
       "
@@ -123,7 +121,7 @@ services:
     environment:
       ENVIRONMENT: test
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres-test:5432/${POSTGRES_TEST_DB:-line_commerce_test}
-      JWT_SECRET_KEY: test-jwt-secret-key-for-testing-only-not-secure
+      JWT_SECRET_KEY: test-jwt-secret-key-for-testing-only-not-secure-min-32-chars
     volumes:
       - ./backend:/app
       - ./scripts:/scripts

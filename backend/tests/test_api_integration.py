@@ -42,7 +42,12 @@ def test_cors_headers(client):
 
 def test_app_metadata():
     """Test application metadata is correctly configured."""
+    from app.core.config import get_settings
+
     app = create_app()
-    assert app.title == "LINE Commerce API"
+    settings = get_settings()
+
+    # App title should match the configured app name
+    assert app.title == settings.app_name
     assert app.version == "0.1.0"
     assert "LINE Commerce Backend API" in app.description

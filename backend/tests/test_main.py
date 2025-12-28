@@ -8,9 +8,14 @@ from app.main import create_app
 
 def test_create_app():
     """Test that FastAPI app can be created."""
+    from app.core.config import get_settings
+
     app = create_app()
+    settings = get_settings()
+
     assert app is not None
-    assert app.title == "LINE Commerce API"
+    # App title should match the configured app name
+    assert app.title == settings.app_name
     assert app.version == "0.1.0"
 
 

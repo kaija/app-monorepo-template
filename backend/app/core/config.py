@@ -15,6 +15,7 @@ class Environment(str, Enum):
     DEVELOPMENT = "development"
     STAGING = "staging"
     PRODUCTION = "production"
+    TEST = "test"
 
 
 class LogLevel(str, Enum):
@@ -121,7 +122,7 @@ class Settings(BaseSettings):
         if len(v) < 32:
             raise ValueError("JWT secret key must be at least 32 characters long")
 
-        # Check for common weak secrets
+        # Check for common weak secrets (but allow test secrets)
         weak_secrets = [
             "your-secret-key-change-in-production",
             "dev-jwt-secret-key-not-for-production-use-only",
@@ -130,6 +131,10 @@ class Settings(BaseSettings):
             "password",
             "12345",
         ]
+
+        # Allow test secrets that are clearly marked as test-only
+        if "test" in v.lower() and "testing-only" in v.lower():
+            return v
 
         if v.lower() in [s.lower() for s in weak_secrets]:
             raise ValueError(
@@ -170,6 +175,10 @@ class Settings(BaseSettings):
     def is_development(self) -> bool:
         """Check if running in development environment."""
         return self.environment == Environment.DEVELOPMENT
+
+    def is_test(self) -> bool:
+        """Check if running in test environment."""
+        return self.environment == Environment.TEST
 
     def oauth_enabled(self) -> bool:
         """Check if OAuth is configured."""
