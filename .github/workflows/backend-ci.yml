@@ -95,7 +95,7 @@ jobs:
         name: backend-coverage
     
     - name: Upload coverage artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: backend-coverage-${{ matrix.python-version }}
         path: backend/htmlcov/
@@ -151,7 +151,7 @@ jobs:
       run: bandit -r app/ -f json -o bandit-report.json || true
     
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: |
@@ -182,7 +182,7 @@ jobs:
         outputs: type=docker,dest=/tmp/backend-image.tar
     
     - name: Upload Docker image artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: backend-docker-image
         path: /tmp/backend-image.tar
