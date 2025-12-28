@@ -68,10 +68,10 @@ jobs:
                 if file.endswith('.py') and file != '__init__.py':
                     with open(os.path.join(migration_dir, file), 'r') as f:
                         content = f.read()
-                        # Check for required Alembic functions
-                        if 'def upgrade():' not in content:
+                        # Check for required Alembic functions (with or without type annotations)
+                        if not re.search(r'def upgrade\(\).*:', content):
                             raise ValueError(f'Migration {file} missing upgrade() function')
-                        if 'def downgrade():' not in content:
+                        if not re.search(r'def downgrade\(\).*:', content):
                             raise ValueError(f'Migration {file} missing downgrade() function')
                     print(f'✓ Migration {file} is valid')
         "
@@ -288,13 +288,13 @@ jobs:
             # Insert test user
             conn.execute(text('''
                 INSERT INTO users (id, email, display_name, is_active) 
-                VALUES (gen_random_uuid(), 'test@example.com', 'Test User', true)
+                VALUES (uuid_generate_v4(), 'test@example.com', 'Test User', true)
             '''))
             
             # Insert test item
             conn.execute(text('''
                 INSERT INTO items (id, name, description, price, user_id) 
-                SELECT gen_random_uuid(), 'Test Item', 'Test Description', 99.99, id 
+                SELECT uuid_generate_v4(), 'Test Item', 'Test Description', 99.99, id 
                 FROM users WHERE email = 'test@example.com'
             '''))
             
@@ -324,13 +324,13 @@ jobs:
         
         with engine.connect() as conn:
             # Check that test data exists
-            result = conn.execute(text('SELECT COUNT(*) FROM users WHERE email = %s'), ('test@example.com',))
+            result = conn.execute(text('SELECT COUNT(*) FROM users WHERE email = :email'), {'email': 'test@example.com'})
             user_count = result.scalar()
             
             if user_count != 1:
                 raise ValueError(f'Expected 1 test user, found {user_count}')
             
-            result = conn.execute(text('SELECT COUNT(*) FROM items WHERE name = %s'), ('Test Item',))
+            result = conn.execute(text('SELECT COUNT(*) FROM items WHERE name = :name'), {'name': 'Test Item'})
             item_count = result.scalar()
             
             if item_count != 1:

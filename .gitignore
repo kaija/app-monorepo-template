@@ -150,3 +150,7 @@ dmypy.json
 
 # Local development overrides
 docker-compose.override.yml
+
+# Security scan results
+security-results/
+*.sarif

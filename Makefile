@@ -126,6 +126,18 @@ migrate-create: ## Create new migration (usage: make migrate-create message="des
 	@echo "$(BLUE)📝 Creating new migration: $(message)$(NC)"
 	@docker-compose -f $(COMPOSE_FILE) exec backend alembic revision --autogenerate -m "$(message)"
 
+validate-migrations: ## Validate Alembic migration files
+	@echo "$(BLUE)🔍 Validating migration files...$(NC)"
+	@./scripts/validate-migrations.sh
+
+test-database: ## Test database migrations and operations
+	@echo "$(BLUE)🗄️  Testing database operations...$(NC)"
+	@./scripts/test-database.sh
+
+security-scan: ## Run local security scans
+	@echo "$(BLUE)🔒 Running security scans...$(NC)"
+	@./scripts/security-scan.sh
+
 install: ## Install/update dependencies
 	@echo "$(BLUE)📦 Installing dependencies...$(NC)"
 	@docker-compose -f $(COMPOSE_FILE) exec backend pip install -r requirements.txt
