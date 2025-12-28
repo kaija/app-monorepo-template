@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ShoppingBag,
@@ -25,18 +25,7 @@ export default function ConsolePage() {
   const router = useRouter()
   const { user, logout, isLoading: authLoading } = useAuth()
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login')
-      return
-    }
-
-    if (user) {
-      loadItems()
-    }
-  }, [user, authLoading, router])
-
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     try {
       setIsLoading(true)
       setError('')
@@ -54,7 +43,18 @@ export default function ConsolePage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login')
+      return
+    }
+
+    if (user) {
+      loadItems()
+    }
+  }, [user, authLoading, router, loadItems])
 
   const handleLogout = async () => {
     try {

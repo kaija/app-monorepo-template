@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import Link from 'next/link'
 import { AlertCircle, RefreshCw, Home } from 'lucide-react'
 
 export default function Error({
@@ -40,13 +41,13 @@ export default function Error({
               Try Again
             </button>
 
-            <a
+            <Link
               href="/"
               className="btn-secondary flex items-center justify-center"
             >
               <Home className="h-4 w-4 mr-2" />
               Go Home
-            </a>
+            </Link>
           </div>
 
           {process.env.NODE_ENV === 'development' && (

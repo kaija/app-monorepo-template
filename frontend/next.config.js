@@ -1,30 +1,22 @@
 /** @type {import('next').NextConfig} */
 
-// Import configuration validation
-const { config } = require('./lib/config-server')
-
 const nextConfig = {
   // App Router is now stable in Next.js 15, no experimental flag needed
 
-  // Environment variables (validated by config)
-  env: {
-    NEXT_PUBLIC_API_URL: config.apiUrl,
-    NEXT_PUBLIC_APP_URL: config.appUrl,
-    NEXT_PUBLIC_APP_NAME: config.appName,
-  },
-
-  // API proxy to backend
+  // API proxy to backend (only if API URL is available)
   async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     return [
       {
         source: '/api/:path*',
-        destination: `${config.apiUrl}/api/:path*`,
+        destination: `${apiUrl}/api/:path*`,
       },
     ]
   },
 
   // Security headers
   async headers() {
+    const isProduction = process.env.NODE_ENV === 'production';
     return [
       {
         source: '/(.*)',
@@ -45,7 +37,7 @@ const nextConfig = {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
-          ...(config.isProduction ? [
+          ...(isProduction ? [
             {
               key: 'Strict-Transport-Security',
               value: 'max-age=31536000; includeSubDomains',
@@ -58,14 +50,14 @@ const nextConfig = {
 
   // Image optimization
   images: {
-    domains: config.isDevelopment ? ['localhost'] : [],
+    domains: process.env.NODE_ENV === 'development' ? ['localhost'] : [],
     formats: ['image/webp', 'image/avif'],
   },
 
   // Compiler options
   compiler: {
     // Remove console logs in production
-    removeConsole: config.isProduction,
+    removeConsole: process.env.NODE_ENV === 'production',
   },
 
   // Output configuration for deployment
@@ -84,10 +76,9 @@ const nextConfig = {
   },
 
   // Experimental features
-  experimental: {
-    // Enable server actions
-    serverActions: true,
-  },
+  // experimental: {
+  //   // Server actions are now stable in Next.js 15
+  // },
 }
 
 module.exports = nextConfig

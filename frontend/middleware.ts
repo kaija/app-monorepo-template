@@ -8,7 +8,7 @@ const protectedRoutes = ['/console', '/profile']
 const authRoutes = ['/login', '/register']
 
 // Define public routes that don't require authentication
-const publicRoutes = ['/', '/api/health']
+// const publicRoutes = ['/', '/api/health'] // Currently unused but may be needed for future logic
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -30,11 +30,6 @@ export async function middleware(request: NextRequest) {
   // Check if the current path is an auth route
   const isAuthRoute = authRoutes.some(route =>
     pathname.startsWith(route)
-  )
-
-  // Check if the current path is a public route
-  const isPublicRoute = publicRoutes.some(route =>
-    pathname === route || pathname.startsWith(route)
   )
 
   // Get the authentication token from cookies

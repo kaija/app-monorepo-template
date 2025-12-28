@@ -212,6 +212,9 @@ export class ApiError extends Error {
   ) {
     super(message)
     this.name = 'ApiError'
+    // Properties are used as public class properties
+    void status // ESLint: used as public property
+    void data   // ESLint: used as public property
   }
 
   isAuthError(): boolean {

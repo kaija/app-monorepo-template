@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { ShoppingBag, User, Mail, Calendar, Shield, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 
@@ -16,6 +17,19 @@ export default function ProfilePage() {
     } catch (error) {
       console.error('Logout error:', error)
       router.push('/login')
+    }
+  }
+
+  const handleUpdateProfile = async () => {
+    setIsUpdating(true)
+    try {
+      // TODO: Implement profile update API call
+      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+      console.log('Profile updated successfully')
+    } catch (error) {
+      console.error('Profile update error:', error)
+    } finally {
+      setIsUpdating(false)
     }
   }
 
@@ -87,9 +101,11 @@ export default function ProfilePage() {
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
                     {user.avatar_url ? (
-                      <img
+                      <Image
                         src={user.avatar_url}
                         alt="Profile"
+                        width={64}
+                        height={64}
                         className="w-16 h-16 rounded-full object-cover"
                       />
                     ) : (
@@ -166,6 +182,7 @@ export default function ProfilePage() {
                   <button
                     type="submit"
                     disabled={isUpdating}
+                    onClick={handleUpdateProfile}
                     className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isUpdating ? 'Updating...' : 'Save Changes'}

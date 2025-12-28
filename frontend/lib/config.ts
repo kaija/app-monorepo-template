@@ -106,9 +106,13 @@ function validateProductionConfig(): void {
  * Create and validate application configuration
  */
 function createConfig(): AppConfig {
-  // Validate environment variables first
-  validateEnvironmentVariables();
-  validateProductionConfig();
+  // Only validate in production builds, not during development builds
+  const shouldValidate = process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build';
+
+  if (shouldValidate) {
+    validateEnvironmentVariables();
+    validateProductionConfig();
+  }
 
   const config: AppConfig = {
     // Environment
@@ -116,10 +120,10 @@ function createConfig(): AppConfig {
     isDevelopment: process.env.NODE_ENV === 'development',
     isProduction: process.env.NODE_ENV === 'production',
 
-    // API Configuration
-    apiUrl: process.env.NEXT_PUBLIC_API_URL!,
-    appUrl: process.env.NEXT_PUBLIC_APP_URL!,
-    appName: process.env.NEXT_PUBLIC_APP_NAME!,
+    // API Configuration (with fallbacks for development)
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+    appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    appName: process.env.NEXT_PUBLIC_APP_NAME || 'LINE Commerce',
 
     // Feature Flags
     enableOAuth: process.env.NEXT_PUBLIC_ENABLE_OAUTH === 'true',
@@ -178,4 +182,12 @@ export function getApiConfig() {
  */
 export function isFeatureEnabled(feature: keyof Pick<AppConfig, 'enableOAuth' | 'enableRegistration' | 'enableAnalytics'>): boolean {
   return config[feature];
+}
+
+/**
+ * Validate configuration (call this explicitly when needed)
+ */
+export function validateConfig(): void {
+  validateEnvironmentVariables();
+  validateProductionConfig();
 }
