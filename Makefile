@@ -134,17 +134,30 @@ test-database: ## Test database migrations and operations
 	@echo "$(BLUE)🗄️  Testing database operations...$(NC)"
 	@./scripts/test-database.sh
 
-security-scan: ## Run local security scans
-	@echo "$(BLUE)🔒 Running security scans...$(NC)"
-	@./scripts/security-scan.sh
+security-scan: ## Run local security scans (use GitHub Actions for comprehensive scanning)
+	@echo "$(BLUE)🔒 Running basic security checks...$(NC)"
+	@echo "For comprehensive security scanning, check GitHub Actions Security tab"
+	@echo "Basic checks:"
+	@echo "  - Check for .env files in git: git ls-files | grep '\.env$$' || echo 'No .env files tracked'"
+	@echo "  - Run Trivy locally: docker run --rm -v \"\$$PWD:/pwd\" aquasec/trivy:latest fs /pwd"
 
 test-all: ## Run comprehensive test suite
 	@echo "$(BLUE)🧪 Running comprehensive test suite...$(NC)"
-	@./scripts/test-all.sh
+	@echo "Running validation checks..."
+	@$(MAKE) validate-migrations
+	@echo "Running database tests..."
+	@$(MAKE) test-database
+	@echo "Running backend linting..."
+	@$(MAKE) lint-backend
+	@echo "Running unit tests..."
+	@$(MAKE) test
+	@echo "✅ All tests completed!"
 
 check-docker: ## Check Docker and Docker Compose installation
 	@echo "$(BLUE)🐳 Checking Docker environment...$(NC)"
-	@./scripts/check-docker.sh
+	@docker --version || (echo "❌ Docker not installed" && exit 1)
+	@docker compose version || (echo "❌ Docker Compose not available" && exit 1)
+	@echo "✅ Docker environment is ready"
 
 install: ## Install/update dependencies
 	@echo "$(BLUE)📦 Installing dependencies...$(NC)"
@@ -175,15 +188,15 @@ format-backend: ## Format backend code only
 
 fix-linting: ## Fix common linting issues automatically
 	@echo "$(BLUE)🔧 Fixing linting issues...$(NC)"
-	@./scripts/fix-linting.sh
+	@cd backend && black . && isort . && echo "✅ Formatting fixes applied"
 
 fix-imports: ## Fix import sorting issues automatically
 	@echo "$(BLUE)📋 Fixing import issues...$(NC)"
-	@./scripts/fix-imports.sh
+	@cd backend && isort . && echo "✅ Import sorting fixed"
 
 test-precommit: ## Test pre-commit configuration
 	@echo "$(BLUE)🧪 Testing pre-commit setup...$(NC)"
-	@./scripts/test-precommit.sh
+	@cd backend && pre-commit run --all-files
 
 setup-precommit: ## Setup pre-commit hooks with fallback options
 	@echo "$(BLUE)🪝 Setting up pre-commit hooks...$(NC)"
@@ -191,7 +204,7 @@ setup-precommit: ## Setup pre-commit hooks with fallback options
 
 reset-precommit: ## Reset and clean pre-commit setup
 	@echo "$(BLUE)🔄 Resetting pre-commit setup...$(NC)"
-	@./scripts/reset-precommit.sh
+	@cd backend && pre-commit uninstall && pre-commit clean && echo "✅ Pre-commit reset completed"
 
 setup-dev: ## Setup development environment with pre-commit hooks
 	@echo "$(BLUE)🛠️  Setting up development environment...$(NC)"

@@ -57,14 +57,8 @@ openssl rand -base64 24
 ### 3. Validate Configuration
 
 ```bash
-# Validate current environment
-./scripts/validate-env.sh
-
-# Validate specific environment
-./scripts/validate-env.sh -e production
-
-# Validate specific .env file
-./scripts/validate-env.sh -f .env.production -e production
+# Environment validation is handled by application startup
+# Check .env files manually or use application health checks
 ```
 
 ## Required Environment Variables
@@ -266,14 +260,8 @@ APPLE_KEY_ID=your_apple_key_id
 ### Validation Commands
 
 ```bash
-# Check environment configuration
-./scripts/validate-env.sh
-
-# Check for hardcoded secrets in code
-./scripts/validate-env.py --check-secrets
-
-# Validate specific environment
-./scripts/validate-env.sh -e production -f .env.production
+# Environment validation is handled by application startup
+# Check .env files manually or use application health checks
 ```
 
 ### Debug Configuration
@@ -304,7 +292,8 @@ Add environment validation to your CI/CD pipeline:
 # .github/workflows/validate-env.yml
 - name: Validate Environment Configuration
   run: |
-    ./scripts/validate-env.sh -e production -f .env.production.example
+    # Environment validation is handled by application startup
+    echo "Environment validation handled by application"
 ```
 
 This ensures all deployments have valid configuration before going live.

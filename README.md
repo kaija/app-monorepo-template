@@ -17,7 +17,7 @@ A production-ready monorepo template for LINE Commerce applications featuring Ne
    ```bash
    git clone <your-repo-url>
    cd line-commerce-monorepo
-   ./scripts/setup.sh
+   make start
    ```
 
 2. **Start the development environment:**
@@ -85,11 +85,8 @@ This template uses a comprehensive environment configuration system with validat
 
 3. **Validate configuration:**
    ```bash
-   # Validate current environment
-   ./scripts/validate-env.sh
-
-   # Validate for production
-   ./scripts/validate-env.sh -e production
+   # Validate current environment (check .env files manually)
+   # Environment validation is now handled by the application startup
    ```
 
 #### Required Variables
@@ -189,8 +186,8 @@ make restore-db file=backup.sql  # Restore from backup
 **Using Scripts:**
 ```bash
 # Database operations
-python scripts/seed-db.py    # Add sample data
-python scripts/reset-db.py   # Reset database
+make seed              # Add sample data
+make reset             # Reset database (removes all data)
 ```
 
 ## 🚢 Deployment
@@ -551,8 +548,8 @@ python backend/validate_layer_separation.py
 # Validate implementation completeness
 python backend/validate_implementation.py
 
-# Validate environment configuration
-python scripts/validate-env.py
+# Environment validation is handled by application startup
+# Check .env files manually or use application health checks
 ```
 
 📖 **For detailed architecture documentation, see [Architecture Guide](docs/ARCHITECTURE.md)**

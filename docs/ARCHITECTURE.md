@@ -328,7 +328,7 @@ The template includes validation tools to maintain architectural integrity:
 
 - **Layer Separation Validator**: `backend/validate_layer_separation.py`
 - **Implementation Validator**: `backend/validate_implementation.py`
-- **Environment Validator**: `scripts/validate-env.py`
+- **Environment Validation**: Handled by application startup
 
 Run these tools regularly to ensure architectural compliance:
 
@@ -339,8 +339,8 @@ python backend/validate_layer_separation.py
 # Validate implementation completeness
 python backend/validate_implementation.py
 
-# Validate environment configuration
-python scripts/validate-env.py
+# Environment validation is handled by application startup
+# Check .env files manually or use application health checks
 ```
 
 ## Conclusion
