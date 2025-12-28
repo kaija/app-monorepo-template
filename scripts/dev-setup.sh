@@ -39,20 +39,20 @@ wait_for_service() {
     local service_name=$1
     local max_attempts=30
     local attempt=1
-    
+
     print_status "Waiting for $service_name to be healthy..."
-    
+
     while [ $attempt -le $max_attempts ]; do
         if docker compose ps | grep -q "$service_name.*healthy"; then
             print_success "$service_name is healthy!"
             return 0
         fi
-        
+
         echo -n "."
         sleep 2
         attempt=$((attempt + 1))
     done
-    
+
     print_error "$service_name failed to become healthy after $((max_attempts * 2)) seconds"
     return 1
 }
@@ -60,32 +60,32 @@ wait_for_service() {
 # Function to check prerequisites
 check_prerequisites() {
     print_status "Checking prerequisites..."
-    
+
     if ! command_exists docker; then
         print_error "Docker is not installed. Please install Docker first."
         echo "Visit: https://docs.docker.com/get-docker/"
         exit 1
     fi
-    
+
     if ! command_exists docker compose; then
         print_error "Docker Compose is not installed. Please install Docker Compose first."
         echo "Visit: https://docs.docker.com/compose/install/"
         exit 1
     fi
-    
+
     # Check if Docker daemon is running
     if ! docker info >/dev/null 2>&1; then
         print_error "Docker daemon is not running. Please start Docker first."
         exit 1
     fi
-    
+
     print_success "All prerequisites are met!"
 }
 
 # Function to setup environment files
 setup_env_files() {
     print_status "Setting up environment files..."
-    
+
     # Root .env file
     if [ ! -f .env ]; then
         print_status "Creating root .env file from .env.example..."
@@ -94,7 +94,7 @@ setup_env_files() {
     else
         print_status "Root .env file already exists"
     fi
-    
+
     # Backend .env file
     if [ ! -f backend/.env ]; then
         print_status "Creating backend .env file from backend/.env.example..."
@@ -102,7 +102,7 @@ setup_env_files() {
     else
         print_status "Backend .env file already exists"
     fi
-    
+
     # Frontend .env.local file
     if [ ! -f frontend/.env.local ]; then
         print_status "Creating frontend .env.local file from frontend/.env.example..."
@@ -110,42 +110,42 @@ setup_env_files() {
     else
         print_status "Frontend .env.local file already exists"
     fi
-    
+
     print_success "Environment files are ready!"
 }
 
 # Function to build and start services
 start_services() {
     print_status "Building and starting Docker services..."
-    
+
     # Build images
     print_status "Building Docker images..."
     docker compose build --no-cache
-    
+
     # Start services
     print_status "Starting services..."
     docker compose up -d
-    
+
     # Wait for PostgreSQL to be healthy
     wait_for_service "line-commerce-postgres"
-    
+
     # Wait for backend to be healthy
     wait_for_service "line-commerce-backend"
-    
+
     print_success "All services are running!"
 }
 
 # Function to run database migrations
 run_migrations() {
     print_status "Running database migrations..."
-    
+
     # Run Alembic migrations in the backend container
     if docker compose exec -T backend alembic upgrade head; then
         print_success "Database migrations completed!"
     else
         print_warning "Migration failed or Alembic not configured yet"
         print_status "Creating tables from models instead..."
-        
+
         # Fallback: create tables directly from models
         docker compose exec -T backend python -c "
 import asyncio
@@ -167,7 +167,7 @@ print('Tables created successfully!')
 # Function to seed database
 seed_database() {
     print_status "Seeding database with sample data..."
-    
+
     if docker compose exec -T backend python /app/../scripts/seed-db.py; then
         print_success "Database seeded successfully!"
     else
@@ -180,14 +180,14 @@ seed_database() {
 show_status() {
     print_status "Service Status:"
     docker compose ps
-    
+
     echo ""
     print_status "Service URLs:"
     echo "  🌐 Frontend:  http://localhost:3000"
     echo "  🔧 Backend:   http://localhost:8000"
     echo "  📚 API Docs:  http://localhost:8000/docs"
     echo "  🗄️  Database:  postgresql://postgres:postgres@localhost:5432/line_commerce"
-    
+
     echo ""
     print_status "Useful Commands:"
     echo "  📋 View logs:           docker compose logs -f [service]"
@@ -200,39 +200,39 @@ show_status() {
 # Function to run integration tests
 run_tests() {
     print_status "Running integration tests..."
-    
+
     # Ensure services are running
     if ! docker compose ps | grep -q "line-commerce-backend.*Up"; then
         print_error "Backend service is not running. Please start services first."
         exit 1
     fi
-    
+
     # Run backend tests
     print_status "Running backend tests..."
     docker compose exec -T backend python -m pytest tests/ -v
-    
+
     # Run frontend tests (if they exist)
     if [ -d "frontend/tests" ] || [ -f "frontend/package.json" ]; then
         print_status "Running frontend tests..."
         docker compose exec -T frontend npm test -- --watchAll=false
     fi
-    
+
     print_success "All tests completed!"
 }
 
 # Function to clean up
 cleanup() {
     print_status "Cleaning up Docker resources..."
-    
+
     # Stop and remove containers
     docker compose down -v
-    
+
     # Remove unused images
     docker image prune -f
-    
+
     # Remove unused volumes
     docker volume prune -f
-    
+
     print_success "Cleanup completed!"
 }
 

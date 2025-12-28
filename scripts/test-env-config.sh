@@ -27,9 +27,9 @@ TESTS_FAILED=0
 run_test() {
     local test_name="$1"
     local test_command="$2"
-    
+
     print_status "Running: $test_name"
-    
+
     if eval "$test_command" > /dev/null 2>&1; then
         print_success "$test_name"
         ((TESTS_PASSED++))

@@ -24,19 +24,19 @@ export default function CallbackPage() {
 
         // Handle OAuth callback
         await apiClient.handleOAuthCallback(provider, code)
-        
+
         setStatus('success')
-        
+
         // Redirect after a short delay
         setTimeout(() => {
           router.push(redirect)
         }, 2000)
-        
+
       } catch (err) {
         console.error('OAuth callback error:', err)
         setError(err instanceof Error ? err.message : 'Authentication failed')
         setStatus('error')
-        
+
         // Redirect to login after error
         setTimeout(() => {
           router.push('/login?error=OAuth authentication failed')
@@ -53,7 +53,7 @@ export default function CallbackPage() {
         <div className="text-center">
           <ShoppingBag className="h-12 w-12 text-blue-600 mx-auto" />
           <span className="block mt-2 text-2xl font-bold text-gray-900">LINE Commerce</span>
-          
+
           {status === 'loading' && (
             <div className="mt-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -61,7 +61,7 @@ export default function CallbackPage() {
               <p className="text-gray-600 mt-2">Please wait while we authenticate your account.</p>
             </div>
           )}
-          
+
           {status === 'success' && (
             <div className="mt-8">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -73,7 +73,7 @@ export default function CallbackPage() {
               <p className="text-gray-600 mt-2">Redirecting you to your dashboard...</p>
             </div>
           )}
-          
+
           {status === 'error' && (
             <div className="mt-8">
               <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">

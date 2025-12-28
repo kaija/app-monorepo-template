@@ -59,7 +59,7 @@ export default function ProfilePage() {
               >
                 Dashboard
               </button>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
@@ -82,14 +82,14 @@ export default function ProfilePage() {
           <div className="lg:col-span-2">
             <div className="card">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Account Information</h2>
-              
+
               <div className="space-y-6">
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
                     {user.avatar_url ? (
-                      <img 
-                        src={user.avatar_url} 
-                        alt="Profile" 
+                      <img
+                        src={user.avatar_url}
+                        alt="Profile"
                         className="w-16 h-16 rounded-full object-cover"
                       />
                     ) : (
@@ -147,8 +147,8 @@ export default function ProfilePage() {
                       Authentication Method
                     </label>
                     <div className="input-field bg-gray-50 cursor-not-allowed">
-                      {user.oauth_provider ? 
-                        `${user.oauth_provider.charAt(0).toUpperCase() + user.oauth_provider.slice(1)} OAuth` : 
+                      {user.oauth_provider ?
+                        `${user.oauth_provider.charAt(0).toUpperCase() + user.oauth_provider.slice(1)} OAuth` :
                         'Email & Password'
                       }
                     </div>
@@ -183,8 +183,8 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Status</span>
                   <span className={`px-2 py-1 text-xs rounded-full ${
-                    user.is_active 
-                      ? 'bg-green-100 text-green-800' 
+                    user.is_active
+                      ? 'bg-green-100 text-green-800'
                       : 'bg-red-100 text-red-800'
                   }`}>
                     {user.is_active ? 'Active' : 'Inactive'}

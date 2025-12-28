@@ -13,14 +13,14 @@ export default function LandingPage() {
               <span className="ml-2 text-xl font-bold text-gray-900">LINE Commerce</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link 
-                href="/login" 
+              <Link
+                href="/login"
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
                 Sign In
               </Link>
-              <Link 
-                href="/login" 
+              <Link
+                href="/login"
                 className="btn-primary"
               >
                 Get Started
@@ -39,15 +39,15 @@ export default function LandingPage() {
               <span className="text-blue-600"> Platform</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              A modern, scalable e-commerce template with Next.js frontend, FastAPI backend, 
+              A modern, scalable e-commerce template with Next.js frontend, FastAPI backend,
               and production-ready infrastructure. Start building your commerce solution today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/login" className="btn-primary text-lg px-8 py-3">
                 Start Building
               </Link>
-              <a 
-                href="#features" 
+              <a
+                href="#features"
                 className="btn-secondary text-lg px-8 py-3"
               >
                 Learn More
@@ -68,7 +68,7 @@ export default function LandingPage() {
               A complete monorepo template with modern technologies and best practices
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="card text-center">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -79,7 +79,7 @@ export default function LandingPage() {
                 Next.js 15 with App Router, TypeScript, and Tailwind CSS for rapid UI development
               </p>
             </div>
-            
+
             <div className="card text-center">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-6 w-6 text-green-600" />
@@ -89,7 +89,7 @@ export default function LandingPage() {
                 JWT authentication, OAuth integration, and security best practices built-in
               </p>
             </div>
-            
+
             <div className="card text-center">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Users className="h-6 w-6 text-purple-600" />

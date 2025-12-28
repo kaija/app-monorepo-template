@@ -69,9 +69,9 @@ class ApiClient {
 
     try {
       const response = await fetch(url, config)
-      
+
       clearTimeout(timeoutId)
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         throw new ApiError(
@@ -86,23 +86,23 @@ class ApiClient {
       if (contentType && contentType.includes('application/json')) {
         return await response.json()
       }
-      
+
       return {} as T
     } catch (error) {
       clearTimeout(timeoutId)
-      
+
       if (error instanceof ApiError) {
         throw error
       }
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new ApiError('Request timeout', 408)
       }
-      
+
       if (error instanceof Error) {
         throw new ApiError(error.message, 0, error)
       }
-      
+
       throw new ApiError('An unexpected error occurred', 0)
     }
   }
@@ -124,14 +124,14 @@ class ApiClient {
     search?: string
   }): Promise<PaginatedResponse<Item>> {
     const searchParams = new URLSearchParams()
-    
+
     if (params?.page) searchParams.append('page', params.page.toString())
     if (params?.per_page) searchParams.append('per_page', params.per_page.toString())
     if (params?.search) searchParams.append('search', params.search)
 
     const query = searchParams.toString()
     const endpoint = `/items${query ? `?${query}` : ''}`
-    
+
     return this.request<PaginatedResponse<Item>>(endpoint)
   }
 

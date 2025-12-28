@@ -26,7 +26,7 @@ The infrastructure consists of:
    ```bash
    # macOS
    brew install terraform
-   
+
    # Or download from https://terraform.io
    ```
 
@@ -65,7 +65,7 @@ Initialize Terraform with the appropriate backend configuration:
 # For development environment
 terraform init -backend-config=backend-dev.hcl
 
-# For staging environment  
+# For staging environment
 terraform init -backend-config=backend-staging.hcl
 
 # For production environment
@@ -142,12 +142,12 @@ Update the following in `infra/frontend.tf`:
    ```bash
    # Get ECR login token
    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
-   
+
    # Build and tag image
    cd backend
    docker build -t line-commerce-backend .
    docker tag line-commerce-backend:latest <ecr-repo-url>:latest
-   
+
    # Push image
    docker push <ecr-repo-url>:latest
    ```
@@ -228,7 +228,7 @@ aws logs tail /aws/rds/instance/line-commerce-dev-postgres/postgresql --follow
    ```bash
    # Check ECS service events
    aws ecs describe-services --cluster line-commerce-dev-backend-cluster --services line-commerce-dev-backend
-   
+
    # Check CloudWatch logs
    aws logs tail /aws/ecs/line-commerce-dev-backend --follow
    ```

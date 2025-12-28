@@ -44,7 +44,7 @@ echo "🧪 Testing Docker Compose functionality..."
 
 if [ -f "docker-compose.yml" ]; then
     echo "✅ Found docker-compose.yml"
-    
+
     # Test config validation
     if $COMPOSE_CMD config &> /dev/null; then
         echo "✅ Docker Compose configuration is valid"

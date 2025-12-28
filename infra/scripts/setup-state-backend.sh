@@ -38,18 +38,18 @@ check_aws_cli() {
         log_error "AWS CLI is not installed. Please install AWS CLI first."
         exit 1
     fi
-    
+
     if ! aws sts get-caller-identity &> /dev/null; then
         log_error "AWS credentials not configured. Please run 'aws configure' first."
         exit 1
     fi
-    
+
     log_success "AWS CLI is configured"
 }
 
 create_s3_bucket() {
     log_info "Creating S3 bucket for Terraform state: $BUCKET_NAME"
-    
+
     # Create bucket
     if aws s3api create-bucket \
         --bucket "$BUCKET_NAME" \
@@ -66,13 +66,13 @@ create_s3_bucket() {
             exit 1
         fi
     fi
-    
+
     # Enable versioning
     log_info "Enabling versioning on S3 bucket..."
     aws s3api put-bucket-versioning \
         --bucket "$BUCKET_NAME" \
         --versioning-configuration Status=Enabled
-    
+
     # Enable server-side encryption
     log_info "Enabling server-side encryption on S3 bucket..."
     aws s3api put-bucket-encryption \
@@ -86,26 +86,26 @@ create_s3_bucket() {
                 }
             ]
         }'
-    
+
     # Block public access
     log_info "Blocking public access on S3 bucket..."
     aws s3api put-public-access-block \
         --bucket "$BUCKET_NAME" \
         --public-access-block-configuration \
         BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
-    
+
     log_success "S3 bucket configuration completed"
 }
 
 create_dynamodb_table() {
     log_info "Creating DynamoDB table for state locking: $DYNAMODB_TABLE"
-    
+
     # Check if table already exists
     if aws dynamodb describe-table --table-name "$DYNAMODB_TABLE" --region "$AWS_REGION" &>/dev/null; then
         log_warning "DynamoDB table already exists: $DYNAMODB_TABLE"
         return 0
     fi
-    
+
     # Create table
     aws dynamodb create-table \
         --table-name "$DYNAMODB_TABLE" \
@@ -113,20 +113,20 @@ create_dynamodb_table() {
         --key-schema AttributeName=LockID,KeyType=HASH \
         --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
         --region "$AWS_REGION"
-    
+
     # Wait for table to be active
     log_info "Waiting for DynamoDB table to be active..."
     aws dynamodb wait table-exists --table-name "$DYNAMODB_TABLE" --region "$AWS_REGION"
-    
+
     log_success "DynamoDB table created: $DYNAMODB_TABLE"
 }
 
 generate_backend_configs() {
     local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local infra_dir="$(dirname "$script_dir")"
-    
+
     log_info "Generating backend configuration files..."
-    
+
     # Create backend config for each environment
     for env in dev staging prod; do
         cat > "$infra_dir/backend-${env}.hcl" << EOF
@@ -138,7 +138,7 @@ encrypt        = true
 EOF
         log_success "Created backend-${env}.hcl"
     done
-    
+
     # Update terraform.tf with backend configuration
     cat > "$infra_dir/terraform.tf" << EOF
 # Terraform configuration file for backend state management
@@ -152,7 +152,7 @@ terraform {
 
 # Backend configuration files:
 # - backend-dev.hcl     (development environment)
-# - backend-staging.hcl (staging environment)  
+# - backend-staging.hcl (staging environment)
 # - backend-prod.hcl    (production environment)
 #
 # Usage:
@@ -160,7 +160,7 @@ terraform {
 # terraform init -backend-config=backend-staging.hcl
 # terraform init -backend-config=backend-prod.hcl
 EOF
-    
+
     log_success "Updated terraform.tf with backend configuration"
 }
 
@@ -186,7 +186,7 @@ show_next_steps() {
 
 main() {
     log_info "Setting up Terraform remote state backend..."
-    
+
     check_aws_cli
     create_s3_bucket
     create_dynamodb_table

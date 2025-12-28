@@ -13,7 +13,7 @@ cd "$(dirname "$0")/../backend"
 # Check if we have a database URL
 if [ -z "$DATABASE_URL" ]; then
     echo "⚠️  DATABASE_URL not set. Using default test database."
-    export DATABASE_URL="postgresql://testuser:testpassword@localhost:5432/testdb"
+    export DATABASE_URL="postgresql+asyncpg://testuser:testpassword@localhost:5432/testdb"
 fi
 
 # Check if we have JWT_SECRET_KEY
@@ -78,7 +78,7 @@ for col in expected_users_columns:
     if col not in users_columns:
         raise ValueError(f'Expected column {col} not found in users table')
 
-# Check items table structure  
+# Check items table structure
 items_columns = [col['name'] for col in inspector.get_columns('items')]
 expected_items_columns = ['id', 'name', 'description', 'price', 'user_id', 'created_at', 'updated_at']
 
@@ -101,31 +101,31 @@ engine = create_engine(os.getenv('DATABASE_URL'))
 with engine.connect() as conn:
     # Insert test user
     result = conn.execute(text('''
-        INSERT INTO users (id, email, display_name, is_active) 
+        INSERT INTO users (id, email, display_name, is_active)
         VALUES (uuid_generate_v4(), 'test@example.com', 'Test User', true)
         RETURNING id
     '''))
     user_id = result.scalar()
     print(f'✅ Created test user with ID: {user_id}')
-    
+
     # Insert test item
     result = conn.execute(text('''
-        INSERT INTO items (id, name, description, price, user_id) 
+        INSERT INTO items (id, name, description, price, user_id)
         VALUES (uuid_generate_v4(), 'Test Item', 'Test Description', 99.99, :user_id)
         RETURNING id
     '''), {'user_id': user_id})
     item_id = result.scalar()
     print(f'✅ Created test item with ID: {item_id}')
-    
+
     # Query data
     result = conn.execute(text('SELECT COUNT(*) FROM users'))
     user_count = result.scalar()
     print(f'✅ Found {user_count} user(s) in database')
-    
+
     result = conn.execute(text('SELECT COUNT(*) FROM items'))
     item_count = result.scalar()
     print(f'✅ Found {item_count} item(s) in database')
-    
+
     # Clean up test data
     conn.execute(text('DELETE FROM items WHERE user_id = :user_id'), {'user_id': user_id})
     conn.execute(text('DELETE FROM users WHERE id = :user_id'), {'user_id': user_id})

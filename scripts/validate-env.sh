@@ -69,7 +69,7 @@ print_status "Environment: $ENVIRONMENT"
 
 if [[ -n "$ENV_FILE" ]]; then
     print_status "Using env file: $ENV_FILE"
-    
+
     if [[ ! -f "$ENV_FILE" ]]; then
         print_error "Environment file not found: $ENV_FILE"
         exit 1

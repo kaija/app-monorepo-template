@@ -50,7 +50,7 @@ export default function RegisterPage() {
         password: formData.password,
         display_name: formData.displayName || undefined
       })
-      
+
       // Redirect to login with success message
       router.push('/login?message=Registration successful! Please sign in.')
     } catch (err) {

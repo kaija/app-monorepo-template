@@ -58,10 +58,10 @@ Data access is abstracted through repository classes:
 class UserRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
-    
+
     async def get_by_id(self, user_id: UUID) -> Optional[User]:
         # Implementation
-    
+
     async def create(self, user_data: UserCreate) -> User:
         # Implementation
 ```
@@ -79,7 +79,7 @@ Business logic is encapsulated in service classes:
 class AuthService:
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
-    
+
     async def authenticate_user(self, email: str, password: str) -> Optional[User]:
         # Business logic implementation
 ```
@@ -114,7 +114,7 @@ To add new business entities (e.g., Category, Review):
 ```python
 class Category(Base):
     __tablename__ = "categories"
-    
+
     id: Mapped[UUID] = mapped_column(PostgresUUID(as_uuid=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     # Additional fields...
@@ -125,7 +125,7 @@ class Category(Base):
 class CategoryRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
-    
+
     async def get_all(self) -> List[Category]:
         # Implementation
 ```
@@ -135,7 +135,7 @@ class CategoryRepository:
 class CategoryService:
     def __init__(self, category_repo: CategoryRepository):
         self.category_repo = category_repo
-    
+
     async def list_categories(self) -> List[Category]:
         # Business logic
 ```

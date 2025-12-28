@@ -6,7 +6,7 @@
 echo "🔧 Setting up test environment variables..."
 
 # Required environment variables for testing
-export DATABASE_URL="postgresql://testuser:testpassword@localhost:5432/testdb"
+export DATABASE_URL="postgresql+asyncpg://testuser:testpassword@localhost:5432/testdb"
 export JWT_SECRET_KEY="test-jwt-secret-key-for-local-testing-only-not-for-production-use-32chars"
 
 # Optional environment variables with sensible defaults

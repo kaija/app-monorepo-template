@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { 
-  ShoppingBag, 
-  Plus, 
-  Search, 
-  Filter, 
+import {
+  ShoppingBag,
+  Plus,
+  Search,
+  Filter,
   MoreVertical,
   Package,
   Users,
@@ -40,13 +40,13 @@ export default function ConsolePage() {
     try {
       setIsLoading(true)
       setError('')
-      
+
       const response = await apiClient.getItems({ page: 1, per_page: 50 })
       setItems(response.items)
     } catch (error) {
       console.error('Failed to load items:', error)
       setError('Failed to load items. Please try again.')
-      
+
       // If it's an auth error, redirect to login
       if (error instanceof Error && error.message.includes('401')) {
         router.push('/login')
@@ -103,13 +103,13 @@ export default function ConsolePage() {
               <span className="text-sm text-gray-600">
                 Welcome, {user.display_name || user.email}
               </span>
-              <button 
+              <button
                 onClick={() => router.push('/profile')}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
                 Profile
               </button>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
@@ -212,7 +212,7 @@ export default function ConsolePage() {
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
               {error}
-              <button 
+              <button
                 onClick={loadItems}
                 className="ml-2 underline hover:no-underline"
               >

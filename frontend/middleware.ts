@@ -12,7 +12,7 @@ const publicRoutes = ['/', '/api/health']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  
+
   // Skip middleware for static files and API routes (except auth)
   if (
     pathname.startsWith('/_next/') ||
@@ -23,17 +23,17 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check if the current path is a protected route
-  const isProtectedRoute = protectedRoutes.some(route => 
+  const isProtectedRoute = protectedRoutes.some(route =>
     pathname.startsWith(route)
   )
-  
+
   // Check if the current path is an auth route
-  const isAuthRoute = authRoutes.some(route => 
+  const isAuthRoute = authRoutes.some(route =>
     pathname.startsWith(route)
   )
 
   // Check if the current path is a public route
-  const isPublicRoute = publicRoutes.some(route => 
+  const isPublicRoute = publicRoutes.some(route =>
     pathname === route || pathname.startsWith(route)
   )
 
@@ -55,12 +55,12 @@ export async function middleware(request: NextRequest) {
 
   // Create response with security headers
   const response = NextResponse.next()
-  
+
   // Add security headers for all routes
   response.headers.set('X-Frame-Options', 'DENY')
   response.headers.set('X-Content-Type-Options', 'nosniff')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  
+
   // Add CSP header (more permissive for development)
   const cspHeader = [
     "default-src 'self'",
@@ -71,7 +71,7 @@ export async function middleware(request: NextRequest) {
     "connect-src 'self' http://localhost:8000 ws://localhost:3000",
     "frame-ancestors 'none'",
   ].join('; ')
-  
+
   response.headers.set('Content-Security-Policy', cspHeader)
 
   // Add HSTS header for HTTPS in production

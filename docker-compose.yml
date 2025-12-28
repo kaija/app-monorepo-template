@@ -30,32 +30,32 @@ services:
     environment:
       # Environment configuration
       ENVIRONMENT: ${ENVIRONMENT:-development}
-      
+
       # Database configuration
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-line_commerce}
-      
+
       # Authentication & Security
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-secret-key-change-in-production}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES:-30}
-      
+
       # OAuth Configuration
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-}
       APPLE_CLIENT_SECRET: ${APPLE_CLIENT_SECRET:-}
-      
+
       # Application Configuration
       APP_NAME: ${APP_NAME:-LINE Commerce API}
       APP_VERSION: ${APP_VERSION:-0.1.0}
       DEBUG: ${DEBUG:-true}
-      
+
       # CORS Configuration
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
-      
+
       # Logging
       LOG_LEVEL: ${LOG_LEVEL:-debug}
-      
+
       # Development optimizations
       PYTHONPATH: /app
       WATCHFILES_FORCE_POLLING: true
@@ -92,29 +92,29 @@ services:
     environment:
       # Environment configuration
       NODE_ENV: ${NODE_ENV:-development}
-      
+
       # Public API Configuration
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-LINE Commerce}
-      
+
       # Authentication Configuration
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-your-nextauth-secret-change-in-production}
-      
+
       # OAuth Configuration
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-}
       APPLE_CLIENT_SECRET: ${APPLE_CLIENT_SECRET:-}
-      
+
       # Feature Flags
       NEXT_PUBLIC_ENABLE_OAUTH: ${NEXT_PUBLIC_ENABLE_OAUTH:-true}
       NEXT_PUBLIC_ENABLE_REGISTRATION: ${NEXT_PUBLIC_ENABLE_REGISTRATION:-true}
-      
+
       # Analytics
       NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID:-}
-      
+
       # Development Configuration
       NEXT_TELEMETRY_DISABLED: 1
       WATCHPACK_POLLING: true

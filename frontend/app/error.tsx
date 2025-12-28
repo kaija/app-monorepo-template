@@ -22,15 +22,15 @@ export default function Error({
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="h-8 w-8 text-red-600" />
           </div>
-          
+
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Something went wrong
           </h1>
-          
+
           <p className="text-gray-600 mb-6">
             We encountered an unexpected error. Please try again or return to the homepage.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={reset}
@@ -39,7 +39,7 @@ export default function Error({
               <RefreshCw className="h-4 w-4 mr-2" />
               Try Again
             </button>
-            
+
             <a
               href="/"
               className="btn-secondary flex items-center justify-center"
@@ -48,7 +48,7 @@ export default function Error({
               Go Home
             </a>
           </div>
-          
+
           {process.env.NODE_ENV === 'development' && (
             <details className="mt-6 text-left">
               <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">

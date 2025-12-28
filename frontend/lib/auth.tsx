@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await fetch('/api/auth/me', {
         credentials: 'include',
       })
-      
+
       if (response.ok) {
         const userData = await response.json()
         setUser(userData)
@@ -116,12 +116,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 // Utility functions for token management
 export const getAuthToken = (): string | null => {
   if (typeof document === 'undefined') return null
-  
+
   const cookies = document.cookie.split(';')
-  const authCookie = cookies.find(cookie => 
+  const authCookie = cookies.find(cookie =>
     cookie.trim().startsWith('auth-token=')
   )
-  
+
   return authCookie ? authCookie.split('=')[1] : null
 }
 

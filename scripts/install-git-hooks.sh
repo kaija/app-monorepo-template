@@ -25,20 +25,20 @@ backend_files=$(git diff --cached --name-only | grep "^backend/" | grep "\.py$" 
 
 if [ -n "$backend_files" ]; then
     echo "📝 Backend Python files detected, running formatters..."
-    
+
     # Change to project root
     cd "$(git rev-parse --show-toplevel)"
-    
+
     # Run formatters
     ./scripts/format-backend.sh
-    
+
     # Add formatted files back to staging
     for file in $backend_files; do
         if [ -f "$file" ]; then
             git add "$file"
         fi
     done
-    
+
     echo "✅ Backend code formatted and re-staged"
 fi
 

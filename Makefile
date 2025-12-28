@@ -177,6 +177,22 @@ fix-linting: ## Fix common linting issues automatically
 	@echo "$(BLUE)🔧 Fixing linting issues...$(NC)"
 	@./scripts/fix-linting.sh
 
+fix-imports: ## Fix import sorting issues automatically
+	@echo "$(BLUE)📋 Fixing import issues...$(NC)"
+	@./scripts/fix-imports.sh
+
+test-precommit: ## Test pre-commit configuration
+	@echo "$(BLUE)🧪 Testing pre-commit setup...$(NC)"
+	@./scripts/test-precommit.sh
+
+setup-precommit: ## Setup pre-commit hooks with fallback options
+	@echo "$(BLUE)🪝 Setting up pre-commit hooks...$(NC)"
+	@./scripts/setup-precommit.sh
+
+reset-precommit: ## Reset and clean pre-commit setup
+	@echo "$(BLUE)🔄 Resetting pre-commit setup...$(NC)"
+	@./scripts/reset-precommit.sh
+
 setup-dev: ## Setup development environment with pre-commit hooks
 	@echo "$(BLUE)🛠️  Setting up development environment...$(NC)"
 	@cd backend && ./setup-dev.sh

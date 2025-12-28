@@ -53,14 +53,14 @@ services:
     environment:
       # Add Redis configuration
       REDIS_URL: redis://redis:6379/0
-      
+
       # Add email configuration for development
       SMTP_HOST: mailhog
       SMTP_PORT: 1025
       SMTP_USER: ""
       SMTP_PASSWORD: ""
       SMTP_TLS: false
-      
+
       # Enhanced development settings
       RELOAD_DIRS: /app
       RELOAD_INCLUDES: "*.py"
@@ -80,7 +80,7 @@ services:
       # Add development-specific environment variables
       NEXT_PUBLIC_REDIS_URL: redis://localhost:6379
       NEXT_PUBLIC_MAILHOG_URL: http://localhost:8025
-      
+
       # Enhanced hot reloading
       FAST_REFRESH: true
       NEXT_PRIVATE_STANDALONE: true

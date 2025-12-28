@@ -21,19 +21,19 @@ A production-ready monorepo template for LINE Commerce applications featuring Ne
    ```
 
 2. **Start the development environment:**
-   
+
    **Option 1 - Using Make (recommended):**
    ```bash
    make start              # Start development environment
    make dev-tools          # Start with additional tools (pgAdmin, Redis, Mailhog)
    make help               # See all available commands
    ```
-   
+
    **Option 2 - Using development script:**
    ```bash
    ./scripts/dev-setup.sh start    # Full development setup with health checks
    ```
-   
+
    **Option 3 - Using Docker Compose directly:**
    ```bash
    docker-compose up -d            # Basic startup
@@ -66,10 +66,10 @@ This template uses a comprehensive environment configuration system with validat
    ```bash
    # Root configuration
    cp .env.local.example .env
-   
+
    # Frontend configuration
    cp frontend/.env.example frontend/.env.local
-   
+
    # Backend configuration
    cp backend/.env.example backend/.env
    ```
@@ -78,7 +78,7 @@ This template uses a comprehensive environment configuration system with validat
    ```bash
    # Generate JWT secret (32+ characters)
    openssl rand -hex 32
-   
+
    # Generate NextAuth secret
    openssl rand -base64 32
    ```
@@ -87,7 +87,7 @@ This template uses a comprehensive environment configuration system with validat
    ```bash
    # Validate current environment
    ./scripts/validate-env.sh
-   
+
    # Validate for production
    ./scripts/validate-env.sh -e production
    ```
@@ -238,7 +238,7 @@ make dev-plan           # Plan development deployment
 make dev-apply          # Deploy development environment
 make dev-destroy        # Destroy development environment
 
-# Staging environment  
+# Staging environment
 make staging-plan       # Plan staging deployment
 make staging-apply      # Deploy staging environment
 

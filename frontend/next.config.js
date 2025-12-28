@@ -5,7 +5,7 @@ const { config } = require('./lib/config-server')
 
 const nextConfig = {
   // App Router is now stable in Next.js 15, no experimental flag needed
-  
+
   // Environment variables (validated by config)
   env: {
     NEXT_PUBLIC_API_URL: config.apiUrl,
@@ -70,7 +70,7 @@ const nextConfig = {
 
   // Output configuration for deployment
   output: 'standalone',
-  
+
   // TypeScript configuration
   typescript: {
     // Type checking is handled by CI/CD pipeline

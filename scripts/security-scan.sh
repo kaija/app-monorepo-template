@@ -33,17 +33,17 @@ echo ""
 echo "🔍 Step 2: Python dependency security scan..."
 if [ -f "backend/requirements.txt" ]; then
     cd backend
-    
+
     # Install safety if not available
     if ! python -c "import safety" 2>/dev/null; then
         echo "📦 Installing safety..."
         pip install safety
     fi
-    
+
     echo "🔍 Running safety check..."
     safety check --json --output ../security-results/safety-report.json || true
     safety check || echo "⚠️  Safety found some issues (see JSON report for details)"
-    
+
     cd ..
     echo "✅ Python dependency scan completed"
 else
@@ -54,7 +54,7 @@ echo ""
 echo "🔍 Step 3: JavaScript dependency security scan..."
 if [ -f "frontend/package.json" ]; then
     cd frontend
-    
+
     if [ -f "package-lock.json" ]; then
         echo "🔍 Running npm audit..."
         npm audit --audit-level=moderate --json > ../security-results/npm-audit.json || true
@@ -62,7 +62,7 @@ if [ -f "frontend/package.json" ]; then
     else
         echo "⚠️  package-lock.json not found, skipping npm audit"
     fi
-    
+
     cd ..
     echo "✅ JavaScript dependency scan completed"
 else
@@ -87,18 +87,18 @@ if docker info &> /dev/null; then
         echo "🏗️  Building Docker images..."
         docker build -t line-commerce-backend:security-test ./backend --quiet
         docker build -t line-commerce-frontend:security-test ./frontend --quiet
-        
+
         echo "🔍 Scanning backend Docker image..."
         trivy image line-commerce-backend:security-test --format json --output security-results/trivy-backend-docker.json
         trivy image line-commerce-backend:security-test || echo "⚠️  Backend Docker image has vulnerabilities"
-        
+
         echo "🔍 Scanning frontend Docker image..."
         trivy image line-commerce-frontend:security-test --format json --output security-results/trivy-frontend-docker.json
         trivy image line-commerce-frontend:security-test || echo "⚠️  Frontend Docker image has vulnerabilities"
-        
+
         # Clean up test images
         docker rmi line-commerce-backend:security-test line-commerce-frontend:security-test &> /dev/null || true
-        
+
         echo "✅ Docker image security scan completed"
     else
         echo "⚠️  Trivy not available for Docker scanning"

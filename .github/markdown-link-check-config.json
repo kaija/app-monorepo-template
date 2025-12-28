@@ -1,4 +1,26 @@
 {
+  "fallbackHttpStatus": [
+    400,
+    401,
+    403,
+    404,
+    408,
+    429,
+    500,
+    502,
+    503,
+    504
+  ],
+  "httpHeaders": [
+    {
+      "headers": {
+        "Accept": "text/html"
+      },
+      "urls": [
+        "https://github.com"
+      ]
+    }
+  ],
   "ignorePatterns": [
     {
       "pattern": "^http://localhost"
@@ -13,27 +35,7 @@
       "pattern": "^https://127.0.0.1"
     }
   ],
-  "httpHeaders": [
-    {
-      "urls": ["https://github.com"],
-      "headers": {
-        "Accept": "text/html"
-      }
-    }
-  ],
-  "timeout": "20s",
-  "retryOn429": true,
   "retryCount": 3,
-  "fallbackHttpStatus": [
-    400,
-    401,
-    403,
-    404,
-    408,
-    429,
-    500,
-    502,
-    503,
-    504
-  ]
+  "retryOn429": true,
+  "timeout": "20s"
 }

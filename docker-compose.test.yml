@@ -33,21 +33,21 @@ services:
     environment:
       # Test environment configuration
       ENVIRONMENT: test
-      
+
       # Test database configuration
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres-test:5432/${POSTGRES_TEST_DB:-line_commerce_test}
-      
+
       # Authentication & Security (test values)
       JWT_SECRET_KEY: test-jwt-secret-key-for-testing-only-not-secure
       JWT_ALGORITHM: HS256
       JWT_EXPIRE_MINUTES: 30
-      
+
       # Application Configuration
       APP_NAME: "LINE Commerce API (Test)"
       APP_VERSION: 0.1.0
       DEBUG: true
       LOG_LEVEL: debug
-      
+
       # CORS Configuration
       CORS_ORIGINS: http://localhost:3001,http://127.0.0.1:3001
     ports:
@@ -85,20 +85,20 @@ services:
     environment:
       # Test environment configuration
       NODE_ENV: test
-      
+
       # Public API Configuration (test values)
       NEXT_PUBLIC_API_URL: http://localhost:8001
       NEXT_PUBLIC_APP_URL: http://localhost:3001
       NEXT_PUBLIC_APP_NAME: "LINE Commerce (Test)"
-      
+
       # Authentication Configuration (test values)
       NEXTAUTH_URL: http://localhost:3001
       NEXTAUTH_SECRET: test-nextauth-secret-for-testing-only-not-secure
-      
+
       # Feature Flags
       NEXT_PUBLIC_ENABLE_OAUTH: false  # Disable OAuth for testing
       NEXT_PUBLIC_ENABLE_REGISTRATION: true
-      
+
       # Development Configuration
       NEXT_TELEMETRY_DISABLED: 1
     ports:

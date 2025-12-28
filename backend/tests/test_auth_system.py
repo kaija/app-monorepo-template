@@ -4,10 +4,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.core.security import (
-    create_access_token,
-    verify_token,
-)
+from app.core.security import create_access_token, verify_token
 
 
 class TestSecurityFunctions:

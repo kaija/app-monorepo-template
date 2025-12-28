@@ -18,25 +18,25 @@ graph TB
         CH[Console Home]
         AUTH[Auth Middleware]
     end
-    
+
     subgraph "Backend (FastAPI)"
         API[REST API]
         HEALTH[Health Check]
         ITEMS[Items Service]
         AUTHSVC[Auth Service]
     end
-    
+
     subgraph "Data Layer"
         PG[(PostgreSQL)]
         MIG[Migrations]
     end
-    
+
     subgraph "Infrastructure"
         DC[Docker Compose]
         IaC[Infrastructure as Code]
         CI[GitHub Actions]
     end
-    
+
     LP --> API
     LG --> AUTHSVC
     CH --> AUTH
@@ -45,7 +45,7 @@ graph TB
     ITEMS --> PG
     AUTHSVC --> PG
     MIG --> PG
-    
+
     DC --> Frontend
     DC --> Backend
     DC --> PG
@@ -159,7 +159,7 @@ backend/
 - `POST /api/auth/register`: User registration
 - `GET /api/auth/google`: Google OAuth initiation
 - `GET /api/auth/google/callback`: Google OAuth callback
-- `GET /api/auth/apple`: Apple OAuth initiation  
+- `GET /api/auth/apple`: Apple OAuth initiation
 - `GET /api/auth/apple/callback`: Apple OAuth callback
 - `POST /api/auth/logout`: Session termination
 - `GET /api/auth/me`: Current user information
@@ -231,7 +231,7 @@ CREATE TABLE orders (
 ```python
 class User(Base):
     __tablename__ = "users"
-    
+
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password_hash: Mapped[Optional[str]] = mapped_column(String(255))  # Nullable for OAuth users
@@ -242,7 +242,7 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     __table_args__ = (
         UniqueConstraint('oauth_provider', 'oauth_id', name='unique_oauth_account'),
     )
@@ -252,7 +252,7 @@ class User(Base):
 ```python
 class Item(Base):
     __tablename__ = "items"
-    
+
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)

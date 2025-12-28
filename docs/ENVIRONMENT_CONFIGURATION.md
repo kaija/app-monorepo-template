@@ -35,7 +35,7 @@ cp .env.local.example .env
 # Copy frontend template
 cp frontend/.env.example frontend/.env.local
 
-# Copy backend template  
+# Copy backend template
 cp backend/.env.example backend/.env
 
 # Update the values in each file as needed
